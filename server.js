@@ -64,7 +64,7 @@ let dbIsOnline = true;
 
 const dbGuard = async (req, res, next) => {
     // Exempt static assets and the error page itself
-    const exemptPaths = ['/api/setup', '/setup', '/db-error.html', '/css', '/js', '/images', '/favicon.ico', '/uploads', '/metin2_maintenance_bg'];
+    const exemptPaths = ['/api/setup', '/db-error.html', '/css', '/js', '/images', '/favicon.ico', '/uploads', '/metin2_maintenance_bg'];
     if (exemptPaths.some(p => req.path.startsWith(p) || req.path === p)) return next();
 
     // Cache health check for 30 seconds
