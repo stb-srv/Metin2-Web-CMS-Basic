@@ -25,10 +25,10 @@ Logge dich per SSH auf deinem Webserver ein. Lade das Projekt direkt von GitHub 
 cd /home
 
 # Klone das GitHub Repository
-git clone https://github.com/stb-srv/Metin2-Web-CMS-Basic.git metin2-web
+git clone https://github.com/stb-srv/Metin2-Web-CMS-Basic.git Metin2-Web-CMS-Basic
 
 # Wechsle in den neuen Ordner
-cd metin2-web
+cd Metin2-Web-CMS-Basic
 ```
 
 ---
