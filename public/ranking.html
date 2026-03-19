@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metin2 Web | Lädt...</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/js/theme.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/core/modal.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/api.js"></script>
+    <script src="js/core/state.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/main.js"></script>
+
+    <script src="js/core/navbar.js"></script>
+    <script src="js/core/footer.js"></script>
+</head>
+
+<body>
+    <div id="particles-js"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar"></nav>
+
+    <!-- Main Content -->
+    <main class="container" style="padding: 4rem 2rem; min-height: 80vh;">
+        <div class="glass-panel" style="max-width: 1000px; width: 100%; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="fas fa-crown" style="font-size: 3rem; color: var(--gold); margin-bottom: 1rem;"></i>
+                <h1 style="color: var(--primary);">Spieler Rangliste</h1>
+                <p style="color: var(--text-muted);">Die stärksten und aktivsten Spieler des Servers.</p>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; align-items: center;">
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn primary-btn" id="btnRankPlayer" onclick="switchRanking('player')"><i class="fas fa-user"></i> Spieler</button>
+                    <button class="btn secondary-btn" id="btnRankGuild" onclick="switchRanking('guild')"><i class="fas fa-users"></i> Gilden</button>
+                </div>
+                
+                <div class="search-box" style="position: relative; margin-left: auto; min-width: 250px;">
+                    <input type="text" id="rankingSearch" placeholder="Spieler/Gilde suchen..." 
+                           style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white; outline: none; transition: border-color 0.3s;" 
+                           oninput="debounceSearch()">
+                    <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1rem;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead id="rankingTableHeader">
+                        <!-- Fetched dynamically -->
+                    </thead>
+                    <tbody id="rankingTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                <i class="fas fa-spinner fa-spin fa-2x"
+                                    style="color: var(--primary); margin-bottom: 1rem;"></i>
+                                <p>Lade Rangliste...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; flex-wrap: wrap;">
+                <!-- Rendered dynamically -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="dynamic-footer"></footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        let currentRankType = 'player';
+        let currentPage = 1;
+        let searchQuery = '';
+        let searchTimeout;
+
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchQuery = document.getElementById('rankingSearch').value;
+                currentPage = 1; // Reset to first page on search
+                loadRanking();
+            }, 500);
+        }
+
+        function switchRanking(type) {
+            currentRankType = type;
+            currentPage = 1;
+            searchQuery = '';
+            document.getElementById('rankingSearch').value = '';
+            
+            document.getElementById('btnRankPlayer').className = type === 'player' ? 'btn primary-btn' : 'btn secondary-btn';
+            document.getElementById('btnRankGuild').className = type === 'guild' ? 'btn primary-btn' : 'btn secondary-btn';
+            
+            const header = document.querySelector('#rankingTableHeader');
+            if (type === 'player') {
+                header.innerHTML = `<tr style="border-bottom: 2px solid var(--glass-border); color: var(--accent);">
+                        <th style="padding: 1rem;">#</th>
+                        <th style="padding: 1rem;">Reich</th>
+                        <th style="padding: 1rem;">Name</th>
+                        <th style="padding: 1rem;">Gilde</th>
+                        <th style="padding: 1rem;">Klasse</th>
+                        <th style="padding: 1rem;">Level</th>
+                        <th style="padding: 1rem;">EXP</th>
+                        <th style="padding: 1rem;">Spielzeit</th>
+                   </tr>`;
+            } else {
+                header.innerHTML = `<tr style="border-bottom: 2px solid var(--glass-border); color: var(--accent);">
+                        <th style="padding: 1rem;">#</th>
+                        <th style="padding: 1rem;">Reich</th>
+                        <th style="padding: 1rem;">Gildenname</th>
+                        <th style="padding: 1rem;">Anführer</th>
+                        <th style="padding: 1rem;">Level</th>
+                        <th style="padding: 1rem;">Punkte</th>
+                        <th style="padding: 1rem;">S / U / N</th>
+                   </tr>`;
+            }
+                   
+            loadRanking();
+        }
+
+        async function loadRanking() {
+            const tbody = document.getElementById('rankingTableBody');
+            const colCount = currentRankType === 'player' ? 8 : 7;
+            tbody.innerHTML = `<tr><td colspan="${colCount}" style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i></td></tr>`;
+            
+            try {
+                const endpoint = currentRankType === 'player' ? 'players' : 'guilds';
+                const res = await fetch(`${API_URL}/ranking/${endpoint}?page=${currentPage}&q=${encodeURIComponent(searchQuery)}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    tbody.innerHTML = '';
+                    if (data.ranking.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="${colCount}" style="text-align:center; padding: 2rem;">Keine Ergebnisse gefunden.</td></tr>`;
+                        renderPagination(0);
+                        return;
+                    }
+
+                    data.ranking.forEach((entry, index) => {
+                        const globalIndex = ((currentPage - 1) * 10) + index;
+                        let rankCol = `<span style="color: var(--text-main); font-weight: bold;">${globalIndex + 1}</span>`;
+                        if (globalIndex === 0) rankCol = `<i class="fas fa-trophy" style="color: var(--gold); font-size: 1.2rem;"></i>`;
+                        if (globalIndex === 1) rankCol = `<i class="fas fa-medal" style="color: var(--silver); font-size: 1.2rem;"></i>`;
+                        if (globalIndex === 2) rankCol = `<i class="fas fa-medal" style="color: #cd7f32; font-size: 1.2rem;"></i>`;
+
+                        const tr = document.createElement('tr');
+                        tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                        tr.style.transition = 'background 0.2s';
+                        tr.onmouseover = () => tr.style.background = 'rgba(255,255,255,0.02)';
+                        tr.onmouseout = () => tr.style.background = 'transparent';
+                        
+                        // Empire icon/name
+                        let empireHtml = ' - ';
+                        if (entry.empire === 1) empireHtml = `<img src="images/flags/Flag_red.png" title="Shinsoo" style="width: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">`;
+                        if (entry.empire === 2) empireHtml = `<img src="images/flags/Flag_yellow.png" title="Chunjo" style="width: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">`;
+                        if (entry.empire === 3) empireHtml = `<img src="images/flags/Flag_blue.png" title="Jinno" style="width: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">`;
+
+                        if (currentRankType === 'player') {
+                            const raceId = parseInt(entry.job);
+                            let jobName = "Unbekannt";
+                            if ([0, 4].includes(raceId)) jobName = "Krieger";
+                            if ([1, 5].includes(raceId)) jobName = "Ninja";
+                            if ([2, 6].includes(raceId)) jobName = "Sura";
+                            if ([3, 7].includes(raceId)) jobName = "Schamane";
+                            if (raceId === 8) jobName = "Lykaner";
+
+                            tr.innerHTML = `
+                                <td style="padding: 1rem;">${rankCol}</td>
+                                <td style="padding: 1rem; text-align: center;">${empireHtml}</td>
+                                <td style="padding: 1rem; font-weight: 600;">${entry.name}</td>
+                                <td style="padding: 1rem; color: var(--text-muted); font-size: 0.9rem;">${entry.guild_name || ' - '}</td>
+                                <td style="padding: 1rem; color: var(--text-muted);">${jobName}</td>
+                                <td style="padding: 1rem; color: var(--accent); font-weight: bold;">${entry.level}</td>
+                                <td style="padding: 1rem; color: var(--primary); font-size: 0.85rem;">${entry.exp.toLocaleString()}</td>
+                                <td style="padding: 1rem; color: var(--text-muted); font-size: 0.9rem;">${Math.floor(entry.playtime / 60)}h ${entry.playtime % 60}m</td>
+                            `;
+                        } else {
+                            tr.innerHTML = `
+                                <td style="padding: 1rem;">${rankCol}</td>
+                                <td style="padding: 1rem; text-align: center;">${empireHtml}</td>
+                                <td style="padding: 1rem; font-weight: 600;">${entry.name}</td>
+                                <td style="padding: 1rem; color: var(--text-main);"><i class="fas fa-crown text-gold" style="font-size: 0.7rem; margin-right: 5px;"></i>${entry.master_name || 'Unbekannt'}</td>
+                                <td style="padding: 1rem; color: var(--accent); font-weight: bold;">${entry.level}</td>
+                                <td style="padding: 1rem; color: var(--primary); font-weight: bold;">${entry.ladder_point.toLocaleString()}</td>
+                                <td style="padding: 1rem; font-size: 0.85rem;"><span style="color: var(--success);">${entry.win}</span> / <span style="color: var(--text-muted);">${entry.draw}</span> / <span style="color: var(--danger);">${entry.loss}</span></td>
+                            `;
+                        }
+                        tbody.appendChild(tr);
+                    });
+                    
+                    renderPagination(data.pagination.totalPages);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="${colCount}" style="text-align:center; padding: 2rem; color: var(--danger);">Fehler: ${data.message}</td></tr>`;
+                    renderPagination(0);
+                }
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="${colCount}" style="text-align:center; padding: 2rem; color: var(--danger);">Netzwerkfehler beim Laden der Rangliste.</td></tr>`;
+                renderPagination(0);
+            }
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pagination');
+            container.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+
+            // Simple pagination with limited pages
+            const createBtn = (label, page, active = false, disabled = false) => {
+                const btn = document.createElement('button');
+                btn.className = active ? 'btn primary-btn' : 'btn secondary-btn';
+                btn.style.padding = '0.5rem 1rem';
+                btn.style.minWidth = '40px';
+                btn.innerText = label;
+                if (disabled) btn.disabled = true;
+                else btn.onclick = () => { currentPage = page; loadRanking(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+                return btn;
+            };
+
+            // Previous
+            container.appendChild(createBtn('<', currentPage - 1, false, currentPage === 1));
+
+            // Pages (show max 5)
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+            for (let i = startPage; i <= endPage; i++) {
+                container.appendChild(createBtn(i, i, i === currentPage));
+            }
+
+            // Next
+            container.appendChild(createBtn('>', currentPage + 1, false, currentPage === totalPages));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchRanking('player'); 
+        });
+
+    </script>
+</body>
+
+</html>

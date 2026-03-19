@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote4Coins | Metin2 Web</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/js/theme.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div id="particles-js"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar"></nav>
+
+    <!-- Main Content -->
+    <main class="container" style="padding: 4rem 2rem; min-height: 80vh;">
+        <div class="glass-panel" style="max-width: 900px; width: 100%; margin: 0 auto; padding: 2.5rem;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <i class="fas fa-thumbs-up" style="font-size: 3.5rem; color: var(--gold); margin-bottom: 1rem;"></i>
+                <h1 style="color: var(--primary);">Vote for uns!</h1>
+                <p style="color: var(--text-muted); font-size: 1.1rem;">Unterstütze den Server auf Toplisten und erhalte im Gegenzug wertvolle Drachenmünzen (Coins).</p>
+            </div>
+
+            <!-- Login Prompt (Hidden by default) -->
+            <div id="loginPrompt" style="display: none; text-align: center; padding: 2rem; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.2);">
+                <i class="fas fa-lock" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                <h3>Unbekannter Krieger</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Du musst eingeloggt sein, um Voten zu können und Belohnungen zu empfangen.</p>
+                <button class="btn primary-btn" onclick="openModal('loginModal')">Jetzt Einloggen</button>
+            </div>
+
+            <!-- Vote Links Container -->
+            <div id="voteContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+                <!-- Dynamically loaded links -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 3rem;"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="dynamic-footer"></footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/core/modal.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/api.js"></script>
+    <script src="js/core/state.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/main.js"></script>
+    <script src="js/core/navbar.js"></script>
+    <script src="js/core/footer.js"></script>
+    
+    <script>
+        async function loadVoteLinks() {
+            const container = document.getElementById('voteContainer');
+            const token = localStorage.getItem('m2token');
+            const prompt = document.getElementById('loginPrompt');
+            
+            if (!token) {
+                container.style.display = 'none';
+                prompt.style.display = 'block';
+                return;
+            }
+
+            prompt.style.display = 'none';
+            container.style.display = 'grid';
+
+            try {
+                const res = await apiFetch('/votes/public');
+                if (res.success) {
+                    if (res.links.length === 0) {
+                        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem;">Derzeit sind keine Seiten verknüpft. Komm bald wieder!</div>';
+                        return;
+                    }
+
+                    container.innerHTML = res.links.map(link => {
+                        const canVote = !link.last_vote_time || checkCooldown(link.last_vote_time, link.cooldown_hours);
+                        const disabledFilter = canVote ? '' : 'filter: grayscale(100%) opacity(0.5);';
+                        const btnText = canVote ? `<i class="fas fa-vote-yea"></i> ${link.reward} Coins erhalten` : `<i class="fas fa-clock"></i> Wartezeit`;
+                        const btnClass = canVote ? 'btn-primary' : 'btn-secondary';
+                        const btnAction = canVote ? `onclick="processVote(${link.id}, '${link.url}')"` : 'disabled';
+                        
+                        let imgElement = '';
+                        if (link.image_url) {
+                           imgElement = `<img src="${link.image_url}" alt="${link.title}" style="max-width: 100%; height: auto; max-height: 80px; object-fit: contain; border-radius: 4px; ${disabledFilter}">`;
+                        } else {
+                           imgElement = `<div style="padding: 1rem; color: var(--primary); font-family: 'Cinzel', serif; font-size: 1.2rem; ${disabledFilter}">${link.title}</div>`; 
+                        }
+
+                        return `
+                        <div class="glass-panel" style="padding: 1.5rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s;">
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main);">${link.title}</div>
+                                <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: center; min-height: 100px;">
+                                    ${imgElement}
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.85rem; padding: 0 0.5rem;">
+                                <span style="color: var(--gold);"><i class="fas fa-coins"></i> ${link.reward} Coins</span>
+                                <span style="color: var(--text-muted);"><i class="fas fa-hourglass-half"></i> ${link.cooldown_hours}h</span>
+                            </div>
+                            
+                            <button class="btn-admin ${btnClass}" style="width: 100%; padding: 0.8rem;" ${btnAction}>
+                                ${btnText}
+                            </button>
+                        </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--danger); padding: 2rem;">Fehler: ${res.message}</div>`;
+                }
+            } catch (e) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger); padding: 2rem;">Netzwerkfehler beim Laden.</div>';
+            }
+        }
+
+        function checkCooldown(lastVoteStr, cooldownHours) {
+            const lastVote = new Date(lastVoteStr);
+            const now = new Date();
+            const diffHours = (now - lastVote) / (1000 * 60 * 60);
+            return diffHours >= cooldownHours;
+        }
+
+        async function processVote(linkId, redirectUrl) {
+            try {
+                // Open new tab first before the await, to circumvent browser popup blockers
+                const newWin = window.open(redirectUrl, '_blank');
+                
+                // Immediately process backend reward
+                const res = await apiFetch('/votes/public/vote', {
+                    method: 'POST',
+                    body: JSON.stringify({ linkId })
+                });
+
+                if (res.success) {
+                    customAlert(res.message, 'Vote Erfolgreich');
+                    loadVoteLinks(); // Reload to show wait times
+                } else {
+                    customAlert(res.message, 'Fehler');
+                    if(newWin) newWin.close(); 
+                }
+            } catch(e) {
+                customAlert('Netzwerkfehler', 'Fehler');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadVoteLinks);
+    </script>
+</body>
+
+</html>

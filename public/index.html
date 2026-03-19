@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal 3 | Home</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/js/theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="bg-overlay"></div>
+    <div class="particles" id="particles-js"></div>
+
+    <nav class="navbar"></nav>
+
+    <main class="hero-section">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="title"><span data-i18n="hero.welcome">Willkommen auf</span> <span class="gradient-text" id="heroSiteName">Crystal 3</span></h1>
+                <p class="subtitle" data-i18n="hero.subtitle">Das nächste Kapitel deines Metin2 Abenteuers. Erlebe eine neue Ära von Action, Handel und PvP.</p>
+            </div>
+
+            <div class="auth-box" id="authBox">
+                <!-- Login Form -->
+                <form id="loginForm" class="glass-panel active-form">
+                    <h2 data-i18n="auth.login">Login</h2>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="loginUsername" data-i18n="auth.username" placeholder="Benutzername" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" data-i18n="auth.password" placeholder="Passwort" required>
+                    </div>
+                    <button type="submit" class="btn primary-btn" data-i18n="auth.btn_login">Einloggen</button>
+                    <p class="toggle-text"><span data-i18n="auth.no_account">Noch keinen Account?</span> <span
+                            onclick="toggleAuth('register')" data-i18n="auth.toggle_register">Registrieren</span></p>
+                    <p class="toggle-text" style="margin-top: 5px; font-size: 0.85rem;">
+                        <span onclick="toggleAuth('forgot')" data-i18n="auth.forgot_password" style="color: var(--text-muted); text-decoration: underline;">Passwort vergessen?</span>
+                    </p>
+                    <div id="loginMsg" class="form-msg"></div>
+                </form>
+
+                <!-- Forgot Password Form -->
+                <form id="forgotForm" class="glass-panel" style="display: none;">
+                    <h2 data-i18n="auth.forgot_title">Passwort zurücksetzen</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; text-align: center;">Gib deine Daten ein, um einen Reset-Link zu erhalten.</p>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="forgotUsername" placeholder="Benutzername" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="forgotEmail" placeholder="E-Mail Adresse" required>
+                    </div>
+                    <button type="submit" class="btn primary-btn" data-i18n="auth.btn_reset">Link anfordern</button>
+                    <p class="toggle-text"><span onclick="toggleAuth('login')" data-i18n="auth.back_login">Zurück zum Login</span></p>
+                    <div id="forgotMsg" class="form-msg"></div>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="glass-panel" style="display: none; width: 100%; max-width: 450px;">
+                    <h2 data-i18n="auth.register">Registrierung</h2>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="regUsername" data-i18n="auth.username" placeholder="Benutzername" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="regRealName" data-i18n="auth.real_name" placeholder="Vollständiger Name" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="regEmail" data-i18n="auth.email" placeholder="E-Mail Adresse" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="regEmailConfirm" data-i18n="auth.confirm_email" placeholder="E-Mail wiederholen" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="regPassword" data-i18n="auth.password" placeholder="Passwort" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="regPasswordConfirm" data-i18n="auth.confirm_password" placeholder="Passwort wiederholen" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-key"></i>
+                        <input type="text" id="regSocialID" data-i18n="auth.social_id" placeholder="Löschcode (7 Zeichen)" maxlength="7"
+                            minlength="7" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-shield-alt"></i>
+                        <select id="regQuestion" style="width: 100%; border: none; background: var(--input-bg); color: white; padding: 1rem 1rem 1rem 3rem; outline: none; border-radius: 10px; cursor: pointer; border: 1px solid var(--glass-border); font-size: 0.95rem;">
+                            <option value="" disabled selected data-i18n="auth.select_question">Sicherheitsfrage wählen</option>
+                            <option value="1">Wie hieß dein erstes Haustier?</option>
+                            <option value="2">In welcher Stadt bist du geboren?</option>
+                            <option value="3">Was ist dein Lieblingsgericht?</option>
+                            <option value="4">Wie hieß deine erste Grundschule?</option>
+                            <option value="5">Was war dein erstes Auto?</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-comment-dots"></i>
+                        <input type="text" id="regAnswer" data-i18n="auth.security_answer" placeholder="Antwort auf Sicherheitsfrage" required>
+                    </div>
+
+                    <button type="submit" class="btn primary-btn" data-i18n="auth.btn_register">Account Erstellen</button>
+                    <p class="toggle-text"><span data-i18n="auth.have_account">Bereits einen Account?</span> <span onclick="toggleAuth('login')" data-i18n="auth.toggle_login">Einloggen</span>
+                    </p>
+                    <div id="regMsg" class="form-msg"></div>
+                </form>
+
+                <!-- Profile Block (Shown when logged in) -->
+                <div id="profileBox" class="glass-panel" style="display: none; text-align: center;">
+                    <h2 data-i18n="navbar.account">Dein Account</h2>
+                    <div class="profile-stats" style="margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; width: 100%;">
+                        <p style="margin-bottom: 0.8rem; font-size: 1.4rem; font-weight: 800; color: var(--text-main);"><i class="fas fa-user" style="color: var(--primary); font-size: 1.1rem; margin-right: 8px;"></i> <span id="pUsername" style="letter-spacing: 0.5px;">-</span></p>
+                        <p style="margin-bottom: 0.4rem; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fas fa-coins text-gold"></i> <span id="pCoins" style="font-weight: 700;">0</span> <small style="color: rgba(255,255,255,0.5); font-weight: 400; font-size: 0.75rem;" data-i18n="shop.dr_label">DR (Drachenmünzen)</small></p>
+                        <p style="font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fas fa-circle-notch text-silver"></i> <span id="pCash" style="font-weight: 700;">0</span> <small style="color: rgba(255,255,255,0.5); font-weight: 400; font-size: 0.75rem;" data-i18n="shop.dm_label">DM (Drachenmarken)</small></p>
+                    </div>
+                    <a href="/shop" class="btn primary-btn" data-i18n="navbar.shop"
+                        style="margin-top:15px; text-decoration:none; display:flex; align-items:center; justify-content:center;">Zum Item Shop</a>
+                    <a href="/account" class="btn secondary-btn" data-i18n="navbar.account"
+                        style="margin-top:10px; text-decoration:none; display:flex; align-items:center; justify-content:center;">
+                        <i class="fas fa-cog" style="margin-right: 8px;"></i> Account Einstellungen
+                    </a>
+                    <a href="/admin/" id="profileAdminBtn" class="btn secondary-btn" data-i18n="navbar.admin_panel"
+                        style="margin-top:10px; text-decoration:none; display:none; align-items:center; justify-content:center; color: var(--danger); border-color: rgba(239, 68, 68, 0.4);">
+                        <i class="fas fa-shield-alt" style="margin-right: 8px;"></i> Admin Panel
+                    </a>
+                    <button onclick="logout()" class="btn secondary-btn" style="margin-top:10px;" data-i18n="navbar.logout">Ausloggen</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Server Status Widget (floating, collapsible, managed by main.js) -->
+    <div id="serverStatusWidget" class="server-status-widget">
+        <div class="status-widget-header" onclick="toggleStatusWidget()">
+            <div class="status-widget-header-left">
+                <i class="fas fa-server"></i>
+                <span>Server Status</span>
+            </div>
+            <i class="fas fa-chevron-down status-widget-toggle"></i>
+        </div>
+        <div class="status-widget-body">
+            <div class="status-stat">
+                <span class="status-stat-label">Status</span>
+                <span id="statStatus" class="status-stat-value"><i class="fas fa-spinner fa-spin"></i></span>
+            </div>
+            <div class="status-stat">
+                <span class="status-stat-label">Online (24h)</span>
+                <span id="statPlayers" class="status-stat-value"><i class="fas fa-spinner fa-spin"></i></span>
+            </div>
+            <div class="status-stat">
+                <span class="status-stat-label">Accounts</span>
+                <span id="statAccounts" class="status-stat-value"><i class="fas fa-spinner fa-spin"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <section class="news-section container" id="newsSection">
+        <h2 class="section-title"><i class="fas fa-newspaper"></i> <span data-i18n="news.title">Neuigkeiten & Updates</span></h2>
+        <div class="news-grid" id="newsGrid">
+            <!-- News items will be loaded here -->
+            <div class="news-loading"><i class="fas fa-spinner fa-spin"></i> Lade News...</div>
+        </div>
+    </section>
+ 
+    <!-- Dynamic Page Content (SPA) -->
+    <section class="page-content container" id="dynamicPageContainer" style="display: none; margin-top: 4rem; min-height: 50vh;">
+        <div class="glass-panel anim-up" style="padding: 3rem;">
+            <div id="pageLoading" style="text-align: center; padding: 2rem;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+            </div>
+            <div id="pageContentArea"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="dynamic-footer"></footer>
+
+    <!-- Include particles.js for awesome background effect -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/core/modal.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/api.js"></script>
+    <script src="js/core/state.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/main.js"></script>
+
+    <script src="js/core/navbar.js"></script>
+    <script src="js/core/footer.js"></script>
+    <script src="js/core/cms.js"></script>
+</body>
+
+</html>

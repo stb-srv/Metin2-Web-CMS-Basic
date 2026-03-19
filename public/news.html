@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News — Metin2 Web</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- theme.js must be first — reads localStorage and prevents FOUC -->
+    <script src="/js/theme.js"></script>
+    <style>
+        /* ── News Article Page Layout ─────────────────── */
+        .news-article-container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .news-article-hero {
+            width: 100%;
+            max-height: 400px;
+            overflow: hidden;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .news-article-hero img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .news-article-hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10,10,15,.85) 0%, transparent 60%);
+        }
+
+        .news-article-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            background: rgba(var(--primary-rgb),.15);
+            color: var(--primary);
+            border: 1px solid rgba(var(--primary-rgb),.3);
+            padding: .3rem .85rem;
+            border-radius: 20px;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            margin-bottom: 1rem;
+        }
+
+        .news-article-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .news-article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            color: var(--text-muted);
+            font-size: .85rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .news-article-meta span {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .news-article-body {
+            font-size: 1rem;
+            line-height: 1.85;
+            color: var(--text-main);
+        }
+
+        .news-article-body h1,
+        .news-article-body h2,
+        .news-article-body h3 {
+            color: var(--primary);
+            margin: 1.5rem 0 .75rem;
+        }
+
+        .news-article-body p { margin-bottom: 1rem; }
+
+        .news-article-body img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .news-article-body a,
+        .news-article-body a:visited { color: var(--accent); text-decoration: underline; }
+
+        .news-article-body ul,
+        .news-article-body ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .news-article-body blockquote {
+            border-left: 3px solid var(--primary);
+            padding-left: 1rem;
+            color: var(--text-muted);
+            margin: 1rem 0;
+            font-style: italic;
+        }
+
+        .news-article-body pre,
+        .news-article-body code {
+            background: var(--input-bg);
+            border-radius: 6px;
+            padding: .2rem .5rem;
+            font-family: monospace;
+            font-size: .9em;
+        }
+
+        .news-article-body pre {
+            padding: 1rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .news-back-btn,
+        .news-back-btn:visited {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .55rem 1.1rem;
+            border-radius: 8px;
+            background: rgba(var(--primary-rgb), 0.1);
+            border: 1px solid rgba(var(--primary-rgb), 0.2);
+            color: var(--text-muted);
+            font-size: .85rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all .2s;
+            margin-bottom: 1.5rem;
+        }
+
+        .news-back-btn:hover {
+            background: rgba(255,255,255,.1);
+            color: var(--text-main);
+            border-color: var(--primary);
+        }
+
+        .news-article-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .news-loading-screen {
+            text-align: center;
+            padding: 6rem 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .news-error-box {
+            max-width: 500px;
+            margin: 4rem auto;
+            text-align: center;
+            padding: 3rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .news-error-box i.big {
+            font-size: 3rem;
+            opacity: .3;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .news-article-title { font-size: 1.65rem; }
+            .news-article-container { padding: 1.25rem 1rem 3rem; }
+            .news-article-hero img { height: 220px; }
+            .news-article-meta { gap: .75rem; font-size: .8rem; }
+        }
+
+        @media (max-width: 480px) {
+            .news-article-title { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Same background structure as index.html so theme.js can apply correctly -->
+    <div class="bg-overlay"></div>
+    <div class="particles" id="particles-js"></div>
+
+    <!-- Navbar (rendered by navbar.js) -->
+    <nav class="navbar"></nav>
+
+    <main style="position: relative; z-index: 10; min-height: calc(100vh - 80px);">
+
+        <!-- Loading State -->
+        <div id="articleLoading" class="news-loading-screen">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color:var(--primary);"></i>
+            <p style="color:var(--text-muted); margin-top:1rem;">Artikel wird geladen...</p>
+        </div>
+
+        <!-- Rendered Article (hidden until loaded) -->
+        <div id="articleContent" style="display:none;">
+            <div id="articleHero"></div>
+
+            <div class="news-article-container">
+                <a href="javascript:history.back()" class="news-back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    <span id="backTextTop">Zurück</span>
+                </a>
+
+                <div id="articleBadge" class="news-article-badge"></div>
+                <h1 class="news-article-title" id="articleTitle" style="color: var(--primary);"></h1>
+                <div class="news-article-meta" id="articleMeta"></div>
+                <div class="news-article-body" id="articleBody"></div>
+
+                <div class="news-article-footer">
+                    <a href="/" class="news-back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        <span id="backTextBottom">Zurück zur Startseite</span>
+                    </a>
+                    <span id="articleDateFull" style="color:var(--text-muted); font-size:.8rem;"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="articleError" style="display:none;">
+            <div class="news-error-box glass-panel">
+                <i class="fas fa-newspaper big"></i>
+                <h2 style="margin-bottom:.5rem;">Artikel nicht gefunden</h2>
+                <p style="color:var(--text-muted); margin-bottom:1.5rem;">Dieser Artikel existiert nicht oder wurde gelöscht.</p>
+                <a href="/" class="btn primary-btn" style="text-decoration:none; display:inline-block; width:auto; padding:.75rem 1.5rem;">
+                    <i class="fas fa-home"></i> Zur Startseite
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="dynamic-footer"></footer>
+
+    <!-- Scripts — same load order as index.html so all globals are available -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="/js/core/modal.js"></script>
+    <script src="/js/core/i18n.js"></script>
+    <script src="/js/core/api.js"></script>
+    <script src="/js/core/state.js"></script>
+    <script src="/js/core/auth.js"></script>
+    <script src="/js/core/main.js"></script>
+    <script src="/js/core/navbar.js"></script>
+    <script src="/js/core/footer.js"></script>
+    <script src="/js/core/cms.js"></script>
+
+    <script>
+        /* ── Fetch and render the article ─────────────── */
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Extract article ID from path: /news/123
+            const pathParts = window.location.pathname.split('/').filter(Boolean);
+            const id = pathParts[pathParts.length - 1];
+
+            if (!id || isNaN(parseInt(id, 10))) {
+                return showError();
+            }
+
+            try {
+                // Wait for API_URL to be defined (api.js may set it)
+                const base = (typeof API_URL !== 'undefined' ? API_URL : '/api');
+                const res = await fetch(`${base}/cms/news/${id}`);
+                if (!res.ok) return showError();
+                const data = await res.json();
+
+                if (data.success && data.item) {
+                    renderArticle(data.item);
+                } else {
+                    showError();
+                }
+            } catch (e) {
+                console.error('[news.html]', e);
+                showError();
+            }
+        });
+
+        function renderArticle(item) {
+            // Page title
+            document.title = `${item.title} — ${window.siteSettings?.site_name || 'Metin2 Web'}`;
+
+            // Hero image
+            if (item.image_url) {
+                document.getElementById('articleHero').innerHTML = `
+                    <div class="news-article-hero">
+                        <img src="${item.image_url}" alt="${item.title}">
+                        <div class="news-article-hero-overlay"></div>
+                    </div>`;
+            }
+
+            // Badge
+            document.getElementById('articleBadge').textContent = item.category || 'News';
+
+            // Title
+            document.getElementById('articleTitle').textContent = item.title;
+
+            // Meta
+            const date = new Date(item.created_at);
+            const dateShort = date.toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
+            const timeStr  = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('articleMeta').innerHTML = `
+                <span><i class="far fa-calendar-alt"></i> ${dateShort}</span>
+                <span><i class="far fa-clock"></i> ${timeStr} Uhr</span>
+                ${item.author ? `<span><i class="far fa-user"></i> ${item.author}</span>` : ''}
+            `;
+
+            // Full date in footer
+            document.getElementById('articleDateFull').textContent =
+                date.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+            // Body (rich HTML from Quill / CMS)
+            document.getElementById('articleBody').innerHTML = item.content;
+
+            // Translate back buttons once i18n is ready
+            const translateBackButtons = () => {
+                const backLabel = window.i18n?.t('news.back_to_home') || 'Zurück zur Startseite';
+                
+                const topEl = document.getElementById('backTextTop');
+                const bottomEl = document.getElementById('backTextBottom');
+                
+                if (topEl) topEl.textContent = backLabel;
+                if (bottomEl) bottomEl.textContent = backLabel;
+            };
+
+            if (window.i18n?.isReady) translateBackButtons();
+            document.addEventListener('languageChanged', translateBackButtons);
+
+            // Show content
+            document.getElementById('articleLoading').style.display = 'none';
+            document.getElementById('articleContent').style.display = 'block';
+        }
+
+        function showError() {
+            document.getElementById('articleLoading').style.display = 'none';
+            document.getElementById('articleError').style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

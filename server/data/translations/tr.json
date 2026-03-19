@@ -1,0 +1,72 @@
+{
+    "navbar": {
+        "home": "Ana Sayfa",
+        "shop": "Item Shop",
+        "ranking": "Sıralama",
+        "downloads": "İndirmeler",
+        "info": "Bilgi",
+        "rules": "Kurallar",
+        "bans": "Ban Politikası",
+        "web_store": "Web Deposu",
+        "stash": "Depo",
+        "account": "Hesap",
+        "support": "Destek",
+        "vote": "Oy Ver",
+        "news": "Haberler",
+        "admin_panel": "Admin Panel",
+        "settings": "Ayarlar",
+        "logout": "Çıkış Yap",
+        "login": "Giriş Yap"
+    },
+    "hero": {
+        "welcome": "Hoş geldiniz",
+        "subtitle": "Metin2 maceranının bir sonraki bölümü. Aksiyon, ticaret ve PvP'nin yeni çağını yaşa."
+    },
+    "auth": {
+        "login": "Giriş",
+        "register": "Kayıt",
+        "username": "Kullanıcı adı",
+        "password": "Şifre",
+        "email": "E-posta adresi",
+        "social_id": "Silme kodu (7 karakter)",
+        "btn_login": "Giriş Yap",
+        "btn_register": "Hesap Oluştur",
+        "btn_reset": "Link İste",
+        "have_account": "Zaten hesabın var mı?",
+        "no_account": "Hesabın yok mu?",
+        "toggle_login": "Giriş",
+        "toggle_register": "Kayıt Ol",
+        "forgot_password": "Şifreni mi unuttun?",
+        "forgot_title": "Şifre Sıfırla",
+        "back_login": "Girişe Dön",
+        "msg_loading": "Yükleniyor...",
+        "msg_network_error": "Ağ hatası. Sunucu çalışıyor mu?",
+        "msg_reg_success_suffix": "Artık giriş yapabilirsin."
+    },
+    "shop": {
+        "dr_label": "DC (Ejderha Parası)",
+        "dm_label": "Ejderha Markası"
+    },
+    "news": {
+        "title": "Haberler & Güncellemeler",
+        "read_more": "Devamını oku",
+        "back_to_home": "Anasayfaya Dön",
+        "by": "Yazan"
+    },
+    "ranking": {
+        "title": "Sıralama",
+        "rank": "Sıra",
+        "player": "Oyuncu",
+        "level": "Seviye",
+        "guild": "Lonca"
+    },
+    "downloads": {
+        "title": "İndirmeler",
+        "download": "İndir"
+    },
+    "account": {
+        "title": "Hesabım",
+        "save": "Kaydet",
+        "change_password": "Şifre Değiştir"
+    }
+}

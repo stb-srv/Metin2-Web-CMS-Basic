@@ -1,0 +1,7 @@
+{
+    "name": "items",
+    "version": "1.0.0",
+    "description": "Central item search utility.",
+    "prefix": "/api/items",
+    "active": true
+}

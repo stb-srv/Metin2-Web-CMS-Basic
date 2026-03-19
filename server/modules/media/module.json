@@ -1,0 +1,7 @@
+{
+    "name": "media",
+    "version": "1.0.0",
+    "description": "Central media library and file uploads.",
+    "prefix": "/api/media",
+    "active": true
+}

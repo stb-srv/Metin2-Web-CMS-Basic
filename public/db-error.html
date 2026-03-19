@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wartungsarbeiten | Metin2Next</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Theme overrides will be applied via dynamic-custom-vars style tag */
+            /* Default fallbacks if theme.js fails to load or settings missing */
+            --accent-gold: #fbbf24;
+            --accent-red: var(--danger);
+            --accent-green: var(--success);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)), url('images/maintenance_bg.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            background: linear-gradient(to bottom, #fff, var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        p {
+            color: #a0a0a0;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .status-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #707070;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .online { color: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
+        .offline { color: var(--accent-red); box-shadow: 0 0 10px var(--accent-red); }
+        
+        .dot-green { background: var(--accent-green); }
+        .dot-red { background: var(--accent-red); }
+
+        .btn-retry {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #505050;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Metin2Next</div>
+        <h1>System-Status</h1>
+        <p>Wir führen aktuell Wartungsarbeiten an unserer Datenbank durch oder es besteht ein technisches Problem. Bitte versuche es in Kürze erneut.</p>
+
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-label">Web-Server</div>
+                <div class="status-value online">
+                    <span class="dot dot-green"></span> Online
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-label">Datenbank</div>
+                <div class="status-value offline">
+                    <span class="dot dot-red"></span> Offline
+                </div>
+            </div>
+        </div>
+
+        <button onclick="window.location.reload()" class="btn-retry">Erneut versuchen</button>
+
+        <div class="footer">
+            &copy; 2026 Metin2Next Engineering. Alle Systeme werden überwacht.
+        </div>
+    </div>
+</body>
+</html>

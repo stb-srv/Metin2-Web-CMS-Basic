@@ -1,0 +1,72 @@
+{
+    "navbar": {
+        "home": "Início",
+        "shop": "Loja",
+        "ranking": "Classificação",
+        "downloads": "Downloads",
+        "info": "Info",
+        "rules": "Regras",
+        "bans": "Política de Banimentos",
+        "web_store": "Armazém Web",
+        "stash": "Armazém",
+        "account": "Conta",
+        "support": "Suporte",
+        "vote": "Votar",
+        "news": "Notícias",
+        "admin_panel": "Admin Panel",
+        "settings": "Configurações",
+        "logout": "Sair",
+        "login": "Entrar"
+    },
+    "hero": {
+        "welcome": "Bem-vindo a",
+        "subtitle": "O próximo capítulo da sua aventura Metin2. Viva uma nova era de ação, comércio e PvP."
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Registro",
+        "username": "Nome de usuário",
+        "password": "Senha",
+        "email": "Endereço de e-mail",
+        "social_id": "Código de exclusão (7 caracteres)",
+        "btn_login": "Entrar",
+        "btn_register": "Criar conta",
+        "btn_reset": "Solicitar link",
+        "have_account": "Já tem uma conta?",
+        "no_account": "Não tem uma conta?",
+        "toggle_login": "Entrar",
+        "toggle_register": "Registrar",
+        "forgot_password": "Esqueceu a senha?",
+        "forgot_title": "Redefinir senha",
+        "back_login": "Voltar ao login",
+        "msg_loading": "Carregando...",
+        "msg_network_error": "Erro de rede. O servidor está funcionando?",
+        "msg_reg_success_suffix": "Agora você pode fazer login."
+    },
+    "shop": {
+        "dr_label": "DC (Moedas do Dragão)",
+        "dm_label": "Marcas do Dragão"
+    },
+    "news": {
+        "title": "Notícias & Atualizações",
+        "read_more": "Leia mais",
+        "back": "Voltar ao início",
+        "by": "Por"
+    },
+    "ranking": {
+        "title": "Classificação",
+        "rank": "Posição",
+        "player": "Jogador",
+        "level": "Nível",
+        "guild": "Guilda"
+    },
+    "downloads": {
+        "title": "Downloads",
+        "download": "Baixar"
+    },
+    "account": {
+        "title": "Minha Conta",
+        "save": "Salvar",
+        "change_password": "Alterar senha"
+    }
+}

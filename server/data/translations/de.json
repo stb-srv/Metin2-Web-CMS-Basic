@@ -1,0 +1,77 @@
+{
+    "navbar": {
+        "home": "Startseite",
+        "shop": "Item Shop",
+        "ranking": "Rangliste",
+        "downloads": "Downloads",
+        "info": "Info",
+        "rules": "Serverregeln",
+        "bans": "Bann-Richtlinien",
+        "web_store": "Web-Lager",
+        "stash": "Lager",
+        "account": "Account",
+        "support": "Support",
+        "vote": "Abstimmen",
+        "news": "Neuigkeiten",
+        "admin_panel": "Admin Panel",
+        "settings": "Einstellungen",
+        "logout": "Ausloggen",
+        "login": "Einloggen"
+    },
+    "hero": {
+        "welcome": "Willkommen auf",
+        "subtitle": "Das nächste Kapitel deines Metin2 Abenteuers. Erlebe eine neue Ära von Action, Handel und PvP."
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Registrierung",
+        "username": "Benutzername",
+        "password": "Passwort",
+        "email": "E-Mail Adresse",
+        "confirm_email": "E-Mail wiederholen",
+        "real_name": "Vollständiger Name",
+        "social_id": "Löschcode (7 Zeichen)",
+        "confirm_password": "Passwort wiederholen",
+        "select_question": "Sicherheitsfrage wählen",
+        "security_answer": "Sicherheitsantwort",
+        "btn_login": "Einloggen",
+        "btn_register": "Account Erstellen",
+        "btn_reset": "Link anfordern",
+        "have_account": "Bereits einen Account?",
+        "no_account": "Noch keinen Account?",
+        "toggle_login": "Einloggen",
+        "toggle_register": "Registrieren",
+        "forgot_password": "Passwort vergessen?",
+        "forgot_title": "Passwort zurücksetzen",
+        "back_login": "Zurück zum Login",
+        "msg_loading": "Lade...",
+        "msg_network_error": "Netzwerkfehler. Läuft der Server?",
+        "msg_reg_success_suffix": "Du kannst dich nun einloggen."
+    },
+    "shop": {
+        "dr_label": "DR (Drachenmünzen)",
+        "dm_label": "Drachenmarken"
+    },
+    "news": {
+        "title": "Neuigkeiten & Updates",
+        "read_more": "Weiterlesen",
+        "back_to_home": "Zurück zur Startseite",
+        "by": "Von"
+    },
+    "ranking": {
+        "title": "Rangliste",
+        "rank": "Rang",
+        "player": "Spieler",
+        "level": "Level",
+        "guild": "Gilde"
+    },
+    "downloads": {
+        "title": "Downloads",
+        "download": "Herunterladen"
+    },
+    "account": {
+        "title": "Mein Account",
+        "save": "Speichern",
+        "change_password": "Passwort ändern"
+    }
+}

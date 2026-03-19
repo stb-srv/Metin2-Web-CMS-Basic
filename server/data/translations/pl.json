@@ -1,0 +1,72 @@
+{
+    "navbar": {
+        "home": "Strona główna",
+        "shop": "Sklep",
+        "ranking": "Ranking",
+        "downloads": "Pobierz",
+        "info": "Info",
+        "rules": "Zasady",
+        "bans": "Polityka banów",
+        "web_store": "Magazyn Web",
+        "stash": "Magazyn",
+        "account": "Konto",
+        "support": "Pomoc",
+        "vote": "Głosuj",
+        "news": "Aktualności",
+        "admin_panel": "Panel Admin",
+        "settings": "Ustawienia",
+        "logout": "Wyloguj",
+        "login": "Zaloguj"
+    },
+    "hero": {
+        "welcome": "Witaj na",
+        "subtitle": "Kolejny rozdział Twojej przygody Metin2. Przeżyj nową erę akcji, handlu i PvP."
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Rejestracja",
+        "username": "Nazwa użytkownika",
+        "password": "Hasło",
+        "email": "Adres e-mail",
+        "social_id": "Kod usunięcia (7 znaków)",
+        "btn_login": "Zaloguj",
+        "btn_register": "Utwórz konto",
+        "btn_reset": "Wyślij link",
+        "have_account": "Masz już konto?",
+        "no_account": "Nie masz konta?",
+        "toggle_login": "Zaloguj",
+        "toggle_register": "Zarejestruj",
+        "forgot_password": "Zapomniałeś hasła?",
+        "forgot_title": "Resetuj hasło",
+        "back_login": "Wróć do logowania",
+        "msg_loading": "Ładowanie...",
+        "msg_network_error": "Błąd sieci. Czy serwer działa?",
+        "msg_reg_success_suffix": "Możesz się teraz zalogować."
+    },
+    "shop": {
+        "dr_label": "DC (Monety Smoka)",
+        "dm_label": "Znaki Smoka"
+    },
+    "news": {
+        "title": "Aktualności & Aktualizacje",
+        "read_more": "Czytaj więcej",
+        "back_to_home": "Powrót do strony głównej",
+        "by": "Autor"
+    },
+    "ranking": {
+        "title": "Ranking",
+        "rank": "Pozycja",
+        "player": "Gracz",
+        "level": "Poziom",
+        "guild": "Gildia"
+    },
+    "downloads": {
+        "title": "Pobierz",
+        "download": "Pobierz"
+    },
+    "account": {
+        "title": "Moje Konto",
+        "save": "Zapisz",
+        "change_password": "Zmień hasło"
+    }
+}

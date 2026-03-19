@@ -1,0 +1,7 @@
+{
+    "name": "shop-coins",
+    "version": "1.0.0",
+    "description": "Dragon Coin (DR) Purchase Module with Price List and Promotions.",
+    "prefix": "/api/shop-coins",
+    "active": true
+}
