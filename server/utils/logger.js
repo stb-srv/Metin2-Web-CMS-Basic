@@ -1,8 +1,13 @@
 const winston = require('winston');
 require('winston-daily-rotate-file');
+const fs = require('fs');
 const path = require('path');
 
-const logDir = 'logs';
+const logDir = path.join(__dirname, '..', '..', 'logs');
+
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+}
 
 const fileFormat = winston.format.combine(
     winston.format.timestamp(),
