@@ -1,0 +1,72 @@
+{
+    "navbar": {
+        "home": "Acasă",
+        "shop": "Magazin",
+        "ranking": "Clasament",
+        "downloads": "Descărcări",
+        "info": "Info",
+        "rules": "Reguli",
+        "bans": "Politica de Ban",
+        "web_store": "Depozit Web",
+        "stash": "Depozit",
+        "account": "Cont",
+        "support": "Suport",
+        "vote": "Votează",
+        "news": "Știri",
+        "admin_panel": "Panou Admin",
+        "settings": "Setări",
+        "logout": "Deconectare",
+        "login": "Autentificare"
+    },
+    "hero": {
+        "welcome": "Bun venit pe",
+        "subtitle": "Următorul capitol al aventurii tale Metin2. Trăiește o nouă eră de acțiune, comerț și PvP."
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Înregistrare",
+        "username": "Nume de utilizator",
+        "password": "Parolă",
+        "email": "Adresă de e-mail",
+        "social_id": "Cod de ștergere (7 caractere)",
+        "btn_login": "Autentificare",
+        "btn_register": "Creare cont",
+        "btn_reset": "Solicită link",
+        "have_account": "Ai deja un cont?",
+        "no_account": "Nu ai un cont?",
+        "toggle_login": "Autentificare",
+        "toggle_register": "Înregistrare",
+        "forgot_password": "Ai uitat parola?",
+        "forgot_title": "Resetare parolă",
+        "back_login": "Înapoi la login",
+        "msg_loading": "Se încarcă...",
+        "msg_network_error": "Eroare de rețea. Serverul funcționează?",
+        "msg_reg_success_suffix": "Acum te poți autentifica."
+    },
+    "shop": {
+        "dr_label": "DC (Monede Dragon)",
+        "dm_label": "Mărci Dragon"
+    },
+    "news": {
+        "title": "Știri & Actualizări",
+        "read_more": "Citește mai mult",
+        "back_to_home": "Înapoi la prima pagină",
+        "by": "De"
+    },
+    "ranking": {
+        "title": "Clasament",
+        "rank": "Poziție",
+        "player": "Jucător",
+        "level": "Nivel",
+        "guild": "Breaslă"
+    },
+    "downloads": {
+        "title": "Descărcări",
+        "download": "Descarcă"
+    },
+    "account": {
+        "title": "Contul meu",
+        "save": "Salvează",
+        "change_password": "Schimbă parola"
+    }
+}

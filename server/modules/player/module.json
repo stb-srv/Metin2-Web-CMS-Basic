@@ -1,0 +1,7 @@
+{
+    "name": "player",
+    "version": "1.0.0",
+    "description": "Player management, ranking, and bans.",
+    "prefix": "/api/player",
+    "active": true
+}

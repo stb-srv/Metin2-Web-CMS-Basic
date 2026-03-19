@@ -1,0 +1,16 @@
+/* theme-yellow.css - Chunjo Empire */
+:root.theme-yellow,
+body.theme-yellow {
+    --primary-rgb: 251, 191, 36;
+    --accent-rgb: 245, 158, 11;
+    --primary-hover: #fcd34d;
+    --glass-bg: rgba(69, 45, 10, 0.85);
+}
+
+:root.theme-yellow.light-mode,
+body.theme-yellow.light-mode {
+    --primary-rgb: 217, 119, 6;
+    --accent-rgb: 245, 158, 11;
+    --primary-hover: #fbbf24;
+    --glass-bg: rgba(254, 243, 199, 0.95);
+}

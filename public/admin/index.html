@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — Crystal 3 Web</title>
+    <meta name="description" content="Metin2 Web Panel — Administration Dashboard">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <script src="/js/theme.js"></script>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar (rendered by JS) -->
+        <aside class="admin-sidebar" id="adminSidebar"></aside>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Bar -->
+            <header class="admin-topbar">
+                <div class="topbar-left">
+                    <button class="mobile-toggle" id="mobileToggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <div class="topbar-title" id="topbarTitle">
+                            <i class="fas fa-shield-alt"></i> Admin Panel
+                        </div>
+                        <div class="topbar-breadcrumb" id="topbarBreadcrumb">Dashboard</div>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-user" id="topbarUser">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="topbarUsername">Admin</span>
+                    </div>
+                    <button class="btn-admin btn-secondary btn-sm" onclick="window.location.href = '/'">
+                        <i class="fas fa-arrow-left"></i> Zur Website
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dynamic Content Area -->
+            <main class="admin-content" id="adminContent">
+                <!-- Pages are rendered here by the router -->
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Core Scripts -->
+
+    <script src="/js/core/api.js"></script>
+    <script src="/js/core/state.js"></script>
+    <script src="/js/utils/items.js"></script>
+    <script src="/admin/js/admin-api.js"></script>
+    <script src="js/components/modal.js"></script>
+    <script src="js/components/toast.js"></script>
+    <script src="js/components/sidebar.js"></script>
+    <script src="js/components/item-search-picker.js"></script>
+    <script src="js/components/MediaPicker.js"></script>
+    <script src="js/pages/dashboard.js"></script>
+    <script src="js/pages/web-shop.js"></script>
+    <script src="js/pages/shop-coins.js"></script>
+    <script src="js/pages/item-creator.js"></script>
+    <script src="js/pages/vouchers.js"></script>
+    <script src="js/pages/gifts.js"></script>
+    <script src="js/pages/ingame-shops.js"></script>
+    <script src="js/pages/cms-settings.js"></script>
+    <script src="js/pages/cms-smtp.js"></script>
+    <script src="js/pages/cms-navbar.js"></script>
+    <script src="js/pages/cms-news.js"></script>
+    <script src="js/pages/cms-pages.js"></script>
+    <script src="js/pages/cms-downloads.js"></script>
+    <script src="js/pages/themes.js"></script>
+    <script src="js/pages/i18n-editor.js"></script>
+    <script src="js/pages/players.js"></script>
+    <script src="js/pages/team.js"></script>
+    <script src="js/pages/icon-converter.js"></script>
+    <script src="js/pages/logs.js"></script>
+    <script src="js/pages/events.js"></script>
+    <script src="js/pages/votes.js"></script>
+    <script src="js/pages/cms-media.js"></script>
+    <script src="js/pages/admin-roles.js"></script>
+    <script src="js/admin-core.js"></script>
+</body>
+
+</html>

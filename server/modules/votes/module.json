@@ -1,0 +1,7 @@
+{
+    "name": "votes",
+    "version": "1.0.0",
+    "description": "Vote4Coins system.",
+    "prefix": "/api/votes",
+    "active": true
+}

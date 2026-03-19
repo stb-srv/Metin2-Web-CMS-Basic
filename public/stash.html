@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metin2 Web | Account Einstellungen</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/js/theme.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div id="particles-js"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar"></nav>
+
+    <main class="container"
+        style="margin-top: 2rem; margin-left: auto; margin-right: auto; padding-bottom: 4rem; max-width: 1200px; display: flex; flex-direction: column; align-items: center;">
+        <div class="glass-panel" style="margin-bottom: 2rem; padding: 2rem; text-align: center; width: 100%;">
+            <i class="fas fa-box-open" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+            <h2>Web-Lager (Zwischenspeicher)</h2>
+            <p style="color: var(--text-muted);">Verwalte deine gekauften Items. Lagerplatz: <b>120</b> / Mülleimer:
+                <b>40</b> (auto-clean nach 7 Tagen).
+            </p>
+
+            <div
+                style="display: flex; gap: 1rem; margin-top: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem;">
+                <button class="btn" id="tabStash" onclick="switchTab('stash')"
+                    style="background: rgba(var(--primary-rgb), 0.2); border-color: var(--primary); color: var(--primary); padding: 0.5rem 1.5rem;">
+                    <i class="fas fa-box"></i> Lager (<span id="countStash">0</span>/120)
+                </button>
+                <button class="btn" id="tabTrash" onclick="switchTab('trash')"
+                    style="background: rgba(255,255,255,0.05); color: var(--text-muted); padding: 0.5rem 1.5rem;">
+                    <i class="fas fa-trash-restore"></i> Mülleimer (<span id="countTrash">0</span>/40)
+                </button>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+                <a href="account" class="btn secondary-btn"
+                    style="text-decoration: none; display: inline-block; width: auto; margin-top: 0;">
+                    <i class="fas fa-arrow-left"></i> Zurück zum Account
+                </a>
+                <div id="bulkActions"
+                    style="display: none; gap: 1.5rem; align-items: center; margin-left: auto; background: rgba(255,255,255,0.03); padding: 0.5rem 1.25rem; border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <label
+                        style="cursor: pointer; display: flex; align-items: center; gap: 0.8rem; color: var(--text-muted); font-size: 0.95rem;">
+                        <input type="checkbox" id="selectAllItems" class="custom-checkbox"
+                            onchange="toggleSelectAll(this)"> Alle auswählen
+                    </label>
+                    <button class="btn" id="bulkDeleteBtn"
+                        style="width: auto; background: rgba(var(--danger-rgb), 0.2); color: var(--danger); border: 1px solid rgba(var(--danger-rgb), 0.3); padding: 0.5rem 1rem;"
+                        onclick="bulkDeleteItems()">
+                        <i class="fas fa-trash-alt"></i> Markierte löschen (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Web-Lager (Item Stash) -->
+        <div class="glass-panel" style="margin-top: 1rem; padding: 2rem; width: 100%;">
+
+            <div id="stashGrid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
+                <!-- Stash Items will be injected here -->
+                <div style="text-align: center; grid-column: 1 / -1; padding: 2rem; color: var(--text-muted);">
+                    <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary); margin-bottom: 1rem;"></i>
+                    <p>Lade Web-Lager...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="dynamic-footer"></footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/core/modal.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/api.js"></script>
+    <script src="js/core/state.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/main.js"></script>
+
+    <script src="js/core/navbar.js"></script>
+    <script src="js/core/footer.js"></script>
+    <script>
+        const API_URL_SEC = '/api';
+        let currentView = 'stash'; // stash or trash
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('m2user'));
+            if (!user) {
+                if (typeof customAlert === 'function') {
+                    customAlert('Bitte logge dich zuerst ein.', 'Hinweis');
+                    document.getElementById('globalModalOkBtn').onclick = () => window.location.href = '/';
+                } else {
+                    window.location.href = '/';
+                }
+                return;
+            }
+        });
+
+        // --- Web Stash & Trash Logic ---
+
+        window.switchTab = function (tab) {
+            currentView = tab;
+            const tabStash = document.getElementById('tabStash');
+            const tabTrash = document.getElementById('tabTrash');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+            if (tab === 'stash') {
+                tabStash.style.background = 'rgba(var(--primary-rgb), 0.2)';
+                tabStash.style.borderColor = 'var(--primary)';
+                tabStash.style.color = 'var(--primary)';
+                tabTrash.style.background = 'rgba(255,255,255,0.05)';
+                tabTrash.style.color = 'var(--text-muted)';
+                bulkDeleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Markierte löschen (<span id="selectedCount">0</span>)';
+            } else {
+                tabTrash.style.background = 'rgba(var(--primary-rgb), 0.2)';
+                tabTrash.style.borderColor = 'var(--primary)';
+                tabTrash.style.color = 'var(--primary)';
+                tabStash.style.background = 'rgba(255,255,255,0.05)';
+                tabStash.style.color = 'var(--text-muted)';
+                bulkDeleteBtn.innerHTML = '<i class="fas fa-trash"></i> Endgültig löschen (<span id="selectedCount">0</span>)';
+            }
+            loadStash();
+        };
+
+        async function loadStash() {
+            const user = JSON.parse(localStorage.getItem('m2user'));
+            const stashGrid = document.getElementById('stashGrid');
+            const bulkActions = document.getElementById('bulkActions');
+            const endpoint = currentView === 'stash' ? '/stash' : '/stash/trash';
+
+            try {
+                const res = await fetch(`${API_URL_SEC}${endpoint}`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    // Update counts
+                    if (currentView === 'stash') {
+                        document.getElementById('countStash').innerText = data.items.length;
+                    } else {
+                        document.getElementById('countTrash').innerText = data.items.length;
+                    }
+
+                    if (data.items.length === 0) {
+                        bulkActions.style.display = 'none';
+                        stashGrid.innerHTML = `
+                            <div style="text-align: center; grid-column: 1 / -1; padding: 3rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed var(--glass-border);">
+                                <i class="fas ${currentView === 'stash' ? 'fa-box' : 'fa-trash-alt'}" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <p style="color: var(--text-muted);">Dein ${currentView === 'stash' ? 'Web-Lager' : 'Mülleimer'} ist leer.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    bulkActions.style.display = 'flex';
+                    stashGrid.innerHTML = '';
+                    data.items.forEach(item => {
+                        const dateVal = currentView === 'stash' ? item.created_at : item.deleted_at;
+                        const displayDate = new Date(dateVal).toLocaleDateString('de-DE', {
+                            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                        });
+
+                        let daysLeftHtml = '';
+                        if (currentView === 'trash') {
+                            const delDate = new Date(item.deleted_at);
+                            const expiry = new Date(delDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+                            const diff = Math.max(0, Math.ceil((expiry - new Date()) / (1000 * 60 * 60 * 24)));
+                            daysLeftHtml = `<div style="color: var(--danger); font-size: 0.75rem; margin-bottom: 0.5rem;"><i class="fas fa-clock"></i> Noch ${diff} Tage</div>`;
+                        }
+
+                        // Build Tooltip HTML for Stash
+                        let tooltipHtml = `<div class="tooltip-header">${item.name}</div>`;
+                        if (item.description) {
+                            tooltipHtml += `<div class="tooltip-desc" style="color: var(--accent); font-style: italic; margin-bottom: 0.5rem; white-space: pre-wrap;">${item.description}</div>`;
+                        }
+
+                        // Add Sockets
+                        let hasSockets = false;
+                        let socketsHtml = `<div class="tooltip-sockets">`;
+                        for (let i = 0; i < 3; i++) {
+                            const socketVnum = item[`socket${i}`];
+                            if (socketVnum && socketVnum > 0) {
+                                hasSockets = true;
+                                const stoneName = window.metin2Stones?.find(s => s.id == socketVnum)?.name || `Stein ${socketVnum}`;
+                                socketsHtml += `
+                                    <div class="tooltip-socket">
+                                        <img src="${getItemIconPath(socketVnum)}" onerror="handleIconFallback(this, ${socketVnum})">
+                                        <span>${stoneName}</span>
+                                    </div>
+                                `;
+                            }
+                        }
+                        socketsHtml += `</div>`;
+                        if (hasSockets) tooltipHtml += socketsHtml;
+
+                        // Add Attributes
+                        let attrsHtml = `<div class="tooltip-attrs">`;
+                        let hasAttrs = false;
+                        for (let i = 0; i < 7; i++) {
+                            const attrType = item[`attrtype${i}`];
+                            const attrVal = item[`attrvalue${i}`];
+                            if (attrType && attrType > 0 && attrVal && attrVal > 0) {
+                                hasAttrs = true;
+                                const attrName = window.metin2Bonuses?.find(b => b.id == attrType)?.name || `Bonus ${attrType}`;
+                                attrsHtml += `<div>+${attrVal}% ${attrName}</div>`;
+                            }
+                        }
+                        attrsHtml += `</div>`;
+                        if (hasAttrs) tooltipHtml += attrsHtml;
+
+                        const tooltipInner = `<div class="item-tooltip">${tooltipHtml}</div>`;
+
+                        stashGrid.innerHTML += `
+                            <div class="glass-panel item-card" style="padding: 1.5rem; text-align: center; background: rgba(255,255,255,0.03); width: 100%; position: relative; border: 1px solid ${currentView === 'trash' ? 'rgba(var(--danger-rgb), 0.2)' : 'var(--glass-border)'}">
+                                <div class="item-checkbox-container">
+                                    <input type="checkbox" class="stash-checkbox custom-checkbox" data-id="${item.id}" onchange="updateSelectedCount()">
+                                </div>
+                                <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                                    ${currentView === 'stash' ? `
+                                        <button class="btn" style="width: 32px; height: 32px; padding: 0; background: rgba(var(--danger-rgb), 0.1); color: var(--danger); border: 1px solid rgba(var(--danger-rgb), 0.3); border-radius: 6px;" onclick="deleteStashItem(${item.id})" title="In Mülleimer verschieben">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    ` : `
+                                        <button class="btn" style="width: 32px; height: 32px; padding: 0; background: rgba(var(--danger-rgb), 0.1); color: var(--danger); border: 1px solid rgba(var(--danger-rgb), 0.3); border-radius: 6px;" onclick="permanentDelete(${item.id})" title="Endgültig löschen">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    `}
+                                </div>
+
+                                <div class="tooltip-container" style="display: flex; justify-content: center; align-items: center; height: 80px; margin-bottom: 1rem; cursor: help;">
+                                    <img src="${getItemIconPath(item.vnum)}" onerror="handleIconFallback(this, ${item.vnum})" style="max-height: 80px;">
+                                    <div class="vnum-fallback" style="display: none; padding: 10px; border: 1px dashed var(--glass-border); border-radius: 8px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                                        <i class="fas fa-image" style="display: block; font-size: 1.5rem; margin-bottom: 5px; color: var(--danger);"></i>
+                                        VNUM:<br><strong style="color: var(--text-main);">${item.vnum}</strong>
+                                    </div>
+                                    ${tooltipInner}
+                                </div>
+                                <h4 style="color: var(--text-main); font-size: 1rem; margin-bottom: 0.2rem;">${item.name}</h4>
+                                ${daysLeftHtml}
+                                <div style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.8rem;">
+                                    <i class="far fa-calendar-alt"></i> ${displayDate}
+                                </div>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Menge: x${item.count}</p>
+                                
+                                ${currentView === 'stash' ? `
+                                    <button class="btn primary-btn" style="width: 100%; padding: 0.4rem; font-size: 0.9rem;" onclick="claimStashItem(${item.id})">
+                                        <i class="fas fa-hand-holding-magic"></i> Einlösen
+                                    </button>
+                                ` : `
+                                    <button class="btn" style="width: 100%; padding: 0.4rem; font-size: 0.9rem; background: rgba(var(--primary-rgb), 0.2); border-color: var(--primary); color: var(--primary);" onclick="restoreItem(${item.id})">
+                                        <i class="fas fa-undo"></i> Wiederherstellen
+                                    </button>
+                                `}
+                            </div>
+                        `;
+                    });
+
+                    // Update the OTHER tab count too
+                    if (currentView === 'stash') {
+                        fetch(`${API_URL_SEC}/stash/trash`, { headers: getAuthHeaders() })
+                            .then(r => r.json()).then(d => { if (d.success) document.getElementById('countTrash').innerText = d.items.length; });
+                    } else {
+                        fetch(`${API_URL_SEC}/stash`, { headers: getAuthHeaders() })
+                            .then(r => r.json()).then(d => { if (d.success) document.getElementById('countStash').innerText = d.items.length; });
+                    }
+
+                } else {
+                    stashGrid.innerHTML = `<p style="color: var(--danger); grid-column: 1 / -1; text-align: center;">${data.message}</p>`;
+                }
+            } catch (err) {
+                stashGrid.innerHTML = `<p style="color: var(--danger); grid-column: 1 / -1; text-align: center;">Fehler beim Laden.</p>`;
+            }
+        }
+
+        window.toggleSelectAll = function (el) {
+            const checkboxes = document.querySelectorAll('.stash-checkbox');
+            checkboxes.forEach(cb => cb.checked = el.checked);
+            updateSelectedCount();
+        };
+
+        window.updateSelectedCount = function () {
+            const checked = document.querySelectorAll('.stash-checkbox:checked');
+            document.getElementById('selectedCount').innerText = checked.length;
+        };
+
+        window.claimStashItem = async function (stashId) {
+            if (typeof customConfirm !== 'function') return;
+            customConfirm('Möchtest du dieses Item jetzt in dein Ingame-Lager verschieben?', async () => {
+                const user = JSON.parse(localStorage.getItem('m2user'));
+                try {
+                    const res = await fetch(`${API_URL_SEC}/stash/claim/${stashId}`, {
+                        method: 'POST',
+                        headers: getAuthHeaders()
+                    });
+                    const data = await res.json();
+                    if (data.success) { customAlert(data.message, 'Erfolg'); loadStash(); }
+                    else { customAlert(data.message, 'Fehler'); }
+                } catch (err) { customAlert('Netzwerkfehler.', 'Fehler'); }
+            });
+        };
+
+        window.deleteStashItem = async function (stashId) {
+            if (typeof customConfirm !== 'function') return;
+            customConfirm('Das Item wird in den Mülleimer verschoben.', async () => {
+                const user = JSON.parse(localStorage.getItem('m2user'));
+                try {
+                    const res = await fetch(`${API_URL_SEC}/stash/${stashId}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    });
+                    const data = await res.json();
+                    if (data.success) { customAlert(data.message, 'In Mülleimer verschoben'); loadStash(); }
+                    else { customAlert(data.message, 'Fehler'); }
+                } catch (err) { customAlert('Fehler beim Löschen.', 'Fehler'); }
+            });
+        };
+
+        window.restoreItem = async function (stashId) {
+            const user = JSON.parse(localStorage.getItem('m2user'));
+            try {
+                const res = await fetch(`${API_URL_SEC}/stash/restore/${stashId}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+                const data = await res.json();
+                if (data.success) { customAlert(data.message, 'Wiederhergestellt'); loadStash(); }
+                else { customAlert(data.message, 'Fehler'); }
+            } catch (err) { customAlert('Netzwerkfehler.', 'Fehler'); }
+        };
+
+        window.permanentDelete = async function (stashId) {
+            if (typeof customConfirm !== 'function') return;
+            customConfirm('<b style="color: var(--danger);">WARNUNG:</b> Dieses Item wird endgültig entfernt!', async () => {
+                const user = JSON.parse(localStorage.getItem('m2user'));
+                try {
+                    const res = await fetch(`${API_URL_SEC}/stash/permanent/${stashId}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    });
+                    const data = await res.json();
+                    if (data.success) { customAlert(data.message, 'Endgültig gelöscht'); loadStash(); }
+                    else { customAlert(data.message, 'Fehler'); }
+                } catch (err) { customAlert('Fehler.', 'Fehler'); }
+            });
+        };
+
+        window.bulkDeleteItems = async function () {
+            const checked = document.querySelectorAll('.stash-checkbox:checked');
+            if (checked.length === 0) return customAlert('Keine Items ausgewählt.', 'Hinweis');
+            const ids = Array.from(checked).map(cb => cb.dataset.id);
+            const msg = currentView === 'stash' ? `Sollen diese ${checked.length} Items in den Mülleimer?` : `Sollen diese ${checked.length} Items ENDGÜLTIG gelöscht werden?`;
+
+            customConfirm(msg, async () => {
+                const user = JSON.parse(localStorage.getItem('m2user'));
+                const endpoint = currentView === 'stash' ? '/stash/bulk-delete' : '/stash/bulk-permanent';
+                try {
+                    const res = await fetch(`${API_URL_SEC}${endpoint}`, {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify({ ids })
+                    });
+                    const data = await res.json();
+                    if (data.success) { customAlert(data.message, 'Erfolg'); loadStash(); }
+                    else { customAlert(data.message, 'Fehler'); }
+                } catch (e) { customAlert('Fehler.', 'Fehler'); }
+            });
+        };
+
+        // Initialize Web Stash on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('m2user'));
+            if (user) loadStash();
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+/* sovereign.css - A premium, completely different theme */
+
+:root.skin-sovereign,
+body.skin-sovereign {
+    --bg-dark-rgb: 15, 23, 42;
+    --primary-rgb: 16, 185, 129;
+    --accent-rgb: 245, 158, 11;
+    --primary-hover: #059669;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --glass-bg: rgba(var(--bg-dark-rgb), 0.95);
+    --glass-border: rgba(var(--primary-rgb), 0.3);
+    --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    background: radial-gradient(circle at top, #1e1b4b 0%, rgb(var(--bg-dark-rgb)) 40%, #020617 100%) !important;
+}
+
+/* Sovereign Light Mode */
+:root.skin-sovereign.light-mode,
+body.skin-sovereign.light-mode {
+    --bg-dark-rgb: 248, 250, 252;
+    --primary-rgb: 4, 120, 87;
+    --accent-rgb: 180, 83, 9;
+    --primary-hover: #065f46;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --glass-bg: rgba(255, 255, 255, 0.98);
+    --glass-border: rgba(var(--primary-rgb), 0.2);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: #f1f5f9 !important;
+}
+
+/* Structural changes for Sovereign */
+:root.skin-sovereign .glass-panel,
+body.skin-sovereign .glass-panel {
+    border-radius: 0px;
+    border-top: 4px solid var(--primary);
+    box-shadow: var(--card-shadow);
+    backdrop-filter: none;
+    border-left: 1px solid var(--glass-border);
+    border-right: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+:root.skin-sovereign .btn,
+body.skin-sovereign .btn {
+    border-radius: 0px;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+:root.skin-sovereign .navbar,
+body.skin-sovereign .navbar {
+    background: var(--bg-dark);
+    border-bottom: 3px solid var(--primary);
+}
+
+/* Empire Overlays for Sovereign */
+:root.skin-sovereign.theme-blue,
+body.skin-sovereign.theme-blue {
+    --primary-rgb: 37, 99, 235;
+    --glass-border: rgba(var(--primary-rgb), 0.3);
+}
+
+:root.skin-sovereign.theme-blue.light-mode,
+body.skin-sovereign.theme-blue.light-mode {
+    --glass-bg: rgba(219, 234, 254, 0.95);
+}
+
+:root.skin-sovereign.theme-red,
+body.skin-sovereign.theme-red {
+    --primary-rgb: 220, 38, 38;
+    --glass-border: rgba(var(--primary-rgb), 0.3);
+}
+
+:root.skin-sovereign.theme-red.light-mode,
+body.skin-sovereign.theme-red.light-mode {
+    --glass-bg: rgba(254, 226, 226, 0.95);
+}
+
+:root.skin-sovereign.theme-yellow,
+body.skin-sovereign.theme-yellow {
+    --primary-rgb: 251, 191, 36;
+    --glass-border: rgba(var(--primary-rgb), 0.3);
+}
+
+:root.skin-sovereign.theme-yellow.light-mode,
+body.skin-sovereign.theme-yellow.light-mode {
+    --glass-bg: rgba(254, 243, 199, 0.95);
+}

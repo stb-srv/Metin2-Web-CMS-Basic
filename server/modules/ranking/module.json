@@ -1,0 +1,7 @@
+{
+    "name": "ranking",
+    "version": "1.0.0",
+    "description": "Independent ranking module with advanced search and pagination.",
+    "prefix": "/api/ranking",
+    "active": true
+}

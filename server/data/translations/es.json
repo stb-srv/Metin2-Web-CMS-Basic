@@ -1,0 +1,72 @@
+{
+    "navbar": {
+        "home": "Inicio",
+        "shop": "Tienda",
+        "ranking": "Clasificación",
+        "downloads": "Descargas",
+        "info": "Info",
+        "rules": "Reglas",
+        "bans": "Política de Bans",
+        "web_store": "Almacén Web",
+        "stash": "Almacén",
+        "account": "Cuenta",
+        "support": "Soporte",
+        "vote": "Votar",
+        "news": "Noticias",
+        "admin_panel": "Admin Panel",
+        "settings": "Ajustes",
+        "logout": "Cerrar sesión",
+        "login": "Iniciar sesión"
+    },
+    "hero": {
+        "welcome": "Bienvenido a",
+        "subtitle": "El próximo capítulo de tu aventura Metin2. Vive una nueva era de acción, comercio y PvP."
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Registro",
+        "username": "Usuario",
+        "password": "Contraseña",
+        "email": "Correo electrónico",
+        "social_id": "Código de eliminación (7 caracteres)",
+        "btn_login": "Iniciar sesión",
+        "btn_register": "Crear cuenta",
+        "btn_reset": "Solicitar enlace",
+        "have_account": "¿Ya tienes cuenta?",
+        "no_account": "¿No tienes cuenta?",
+        "toggle_login": "Iniciar sesión",
+        "toggle_register": "Registrarse",
+        "forgot_password": "¿Olvidaste tu contraseña?",
+        "forgot_title": "Restablecer contraseña",
+        "back_login": "Volver al login",
+        "msg_loading": "Cargando...",
+        "msg_network_error": "Error de red. ¿Está el servidor en funcionamiento?",
+        "msg_reg_success_suffix": "Ya puedes iniciar sesión."
+    },
+    "shop": {
+        "dr_label": "DC (Monedas Dragón)",
+        "dm_label": "Marcas Dragón"
+    },
+    "news": {
+        "title": "Noticias & Actualizaciones",
+        "read_more": "Leer más",
+        "back_to_home": "Volver a Inicio",
+        "by": "Por"
+    },
+    "ranking": {
+        "title": "Clasificación",
+        "rank": "Rango",
+        "player": "Jugador",
+        "level": "Nivel",
+        "guild": "Gremio"
+    },
+    "downloads": {
+        "title": "Descargas",
+        "download": "Descargar"
+    },
+    "account": {
+        "title": "Mi Cuenta",
+        "save": "Guardar",
+        "change_password": "Cambiar contraseña"
+    }
+}

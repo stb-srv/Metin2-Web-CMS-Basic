@@ -1,0 +1,7 @@
+{
+    "name": "stash",
+    "version": "1.0.0",
+    "description": "Web Stash (inventory) management.",
+    "prefix": "/api/stash",
+    "active": true
+}

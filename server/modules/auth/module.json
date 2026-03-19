@@ -1,0 +1,7 @@
+{
+    "name": "auth",
+    "version": "1.0.0",
+    "description": "User authentication, login, and registration.",
+    "prefix": "/api/auth",
+    "active": true
+}

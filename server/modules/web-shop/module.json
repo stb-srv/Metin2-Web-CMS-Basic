@@ -1,0 +1,7 @@
+{
+    "name": "web-shop",
+    "version": "1.0.0",
+    "description": "Web Shop for items and currency gifting.",
+    "prefix": "/api/shop",
+    "active": true
+}

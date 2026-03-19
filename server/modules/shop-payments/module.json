@@ -1,0 +1,7 @@
+{
+    "name": "shop-payments",
+    "version": "1.0.0",
+    "description": "Manual Payment Module for Shop Coins (PayPal & Paysafecard).",
+    "prefix": "/api/shop-payments",
+    "active": true
+}

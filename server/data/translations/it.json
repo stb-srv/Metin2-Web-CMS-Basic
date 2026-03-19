@@ -1,0 +1,72 @@
+{
+    "navbar": {
+        "home": "Home",
+        "shop": "Item Shop",
+        "ranking": "Classifica",
+        "downloads": "Download",
+        "info": "Info",
+        "rules": "Regole",
+        "bans": "Politica dei Ban",
+        "web_store": "Magazzino Web",
+        "stash": "Magazzino",
+        "account": "Account",
+        "support": "Supporto",
+        "vote": "Vota",
+        "news": "Notizie",
+        "admin_panel": "Admin Panel",
+        "settings": "Impostazioni",
+        "logout": "Disconnetti",
+        "login": "Accedi"
+    },
+    "hero": {
+        "welcome": "Benvenuto su",
+        "subtitle": "Il prossimo capitolo della tua avventura Metin2. Vivi una nuova era di azione, commercio e PvP."
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Registrazione",
+        "username": "Nome utente",
+        "password": "Password",
+        "email": "Indirizzo e-mail",
+        "social_id": "Codice di cancellazione (7 caratteri)",
+        "btn_login": "Accedi",
+        "btn_register": "Crea account",
+        "btn_reset": "Richiedi link",
+        "have_account": "Hai già un account?",
+        "no_account": "Non hai un account?",
+        "toggle_login": "Accedi",
+        "toggle_register": "Registrati",
+        "forgot_password": "Password dimenticata?",
+        "forgot_title": "Reimposta password",
+        "back_login": "Torna al login",
+        "msg_loading": "Caricamento...",
+        "msg_network_error": "Errore di rete. Il server è in esecuzione?",
+        "msg_reg_success_suffix": "Ora puoi effettuare il login."
+    },
+    "shop": {
+        "dr_label": "DC (Monete Drago)",
+        "dm_label": "Marchi Drago"
+    },
+    "news": {
+        "title": "Notizie & Aggiornamenti",
+        "read_more": "Leggi di più",
+        "back_to_home": "Torna alla Home",
+        "by": "Di"
+    },
+    "ranking": {
+        "title": "Classifica",
+        "rank": "Posizione",
+        "player": "Giocatore",
+        "level": "Livello",
+        "guild": "Gilda"
+    },
+    "downloads": {
+        "title": "Download",
+        "download": "Scarica"
+    },
+    "account": {
+        "title": "Il mio Account",
+        "save": "Salva",
+        "change_password": "Cambia password"
+    }
+}

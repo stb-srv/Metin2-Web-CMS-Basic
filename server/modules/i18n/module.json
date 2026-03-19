@@ -1,0 +1,7 @@
+{
+    "name": "i18n",
+    "version": "1.0.0",
+    "description": "Internationalization and translations.",
+    "prefix": "/api/i18n",
+    "active": true
+}

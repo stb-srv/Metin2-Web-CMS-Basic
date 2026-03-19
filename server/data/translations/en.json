@@ -1,0 +1,72 @@
+{
+    "navbar": {
+        "home": "Home",
+        "shop": "Item Shop",
+        "ranking": "Ranking",
+        "downloads": "Downloads",
+        "info": "Info",
+        "rules": "Rules",
+        "bans": "Ban Policies",
+        "web_store": "Web Stash",
+        "stash": "Stash",
+        "account": "Account",
+        "support": "Support",
+        "vote": "Vote",
+        "news": "News",
+        "admin_panel": "Admin Panel",
+        "settings": "Settings",
+        "logout": "Logout",
+        "login": "Login"
+    },
+    "hero": {
+        "welcome": "Welcome to",
+        "subtitle": "The next chapter of your Metin2 adventure. Experience a new era of action, trade, and PvP."
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Registration",
+        "username": "Username",
+        "password": "Password",
+        "email": "Email Address",
+        "social_id": "Delete Code (7 chars)",
+        "btn_login": "Login",
+        "btn_register": "Create Account",
+        "btn_reset": "Request Link",
+        "have_account": "Already have an account?",
+        "no_account": "Don't have an account?",
+        "toggle_login": "Login",
+        "toggle_register": "Register",
+        "forgot_password": "Forgot password?",
+        "forgot_title": "Reset Password",
+        "back_login": "Back to Login",
+        "msg_loading": "Loading...",
+        "msg_network_error": "Network error. Is the server running?",
+        "msg_reg_success_suffix": "You can now log in."
+    },
+    "shop": {
+        "dr_label": "DC (Dragon Coins)",
+        "dm_label": "Dragon Marks"
+    },
+    "news": {
+        "title": "News & Updates",
+        "read_more": "Read more",
+        "back_to_home": "Back to Home",
+        "by": "By"
+    },
+    "ranking": {
+        "title": "Ranking",
+        "rank": "Rank",
+        "player": "Player",
+        "level": "Level",
+        "guild": "Guild"
+    },
+    "downloads": {
+        "title": "Downloads",
+        "download": "Download"
+    },
+    "account": {
+        "title": "My Account",
+        "save": "Save",
+        "change_password": "Change Password"
+    }
+}

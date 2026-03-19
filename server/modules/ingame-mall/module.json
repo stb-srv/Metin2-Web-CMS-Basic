@@ -1,0 +1,6 @@
+{
+    "name": "ingame-mall",
+    "version": "1.0.0",
+    "active": true,
+    "prefix": "/mall"
+}

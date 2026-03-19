@@ -1,0 +1,16 @@
+/* theme-red.css - Shinsoo Empire */
+:root.theme-red,
+body.theme-red {
+    --primary-rgb: 220, 38, 38;
+    --accent-rgb: 248, 113, 113;
+    --primary-hover: #ef4444;
+    --glass-bg: rgba(69, 10, 10, 0.85);
+}
+
+:root.theme-red.light-mode,
+body.theme-red.light-mode {
+    --primary-rgb: 185, 28, 28;
+    --accent-rgb: 239, 68, 68;
+    --primary-hover: #dc2626;
+    --glass-bg: rgba(254, 226, 226, 0.95);
+}
