@@ -152,61 +152,11 @@ Das Admin-Panel ist in **4 Tabs** organisiert:
 
 ## 🚀 Installation
 
-### Option A: Setup-Assistent (Empfohlen)
+Eine vollständige, anfängerfreundliche **Schritt-für-Schritt Installations-Anleitung** findest du in der separaten Datei:
+👉 **[INSTALL.md lesen](INSTALL.md)**
 
-1. **Dateien hochladen** auf deinen Server
-2. **Pakete installieren**:
-   ```bash
-   cd metin2-web
-   npm install
-   ```
-3. **Server starten**:
-   ```bash
-   node server.js
-   ```
-4. **Browser öffnen**: `http://deine-ip:3000`
-   → Du wirst automatisch zum **Setup-Assistenten** weitergeleitet
-5. **5 Schritte durchgehen**:
-   - ✅ Voraussetzungen prüfen
-   - ✅ Datenbank-Verbindung testen
-   - ✅ Konfiguration speichern (.env wird erstellt)
-   - ✅ Datenbank-Tabellen installieren
-   - ✅ Fertig!
+Das neue `install.sh` Skript nimmt dir zudem die meiste Arbeit ab, indem es automatisch auf Ubuntu, Debian und FreeBSD prüft, welche Abhängigkeiten (Node.js, NPM, PM2) fehlen und diese auf Wunsch mit einem Knopfdruck installiert!
 
-### Option B: Manuelle Installation
-
-1. **Dateien hochladen**:
-   ```bash
-   git clone <repository-url> metin2-web
-   cd metin2-web
-   ```
-
-2. **Pakete installieren**:
-   ```bash
-   npm install
-   ```
-
-3. **`.env` Datei erstellen**:
-   ```env
-   DB_HOST=127.0.0.1
-   DB_USER=root
-   DB_PASSWORD=dein_passwort
-   DB_PORT=3306
-   PORT=3000
-   JWT_SECRET=ein_sehr_langer_geheimer_schluessel_hier
-   JWT_EXPIRES=7d
-   SETUP_DONE=true
-   ```
-
-4. **Datenbank-Tabellen erstellen**:
-   ```bash
-   node install_db.js
-   ```
-
-5. **Server starten**:
-   ```bash
-   npm start
-   ```
 
 ---
 
