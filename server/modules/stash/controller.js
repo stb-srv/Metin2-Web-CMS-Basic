@@ -184,7 +184,30 @@ class StashController {
                 return res.status(400).json({ success: false, message: 'Web-Lager des Spielers ist voll (Max. 120).' });
             }
 
-            await repository.addToWebStash({ ...req.body, account_id: targetAccountId });
+            const itemData = {
+                account_id: targetAccountId,
+                vnum: parseInt(req.body.vnum) || 0,
+                count: parseInt(req.body.count) || 1,
+                socket0: parseInt(req.body.socket0) || 0,
+                socket1: parseInt(req.body.socket1) || 0,
+                socket2: parseInt(req.body.socket2) || 0,
+                attrtype0: parseInt(req.body.attrtype0) || 0,
+                attrvalue0: parseInt(req.body.attrvalue0) || 0,
+                attrtype1: parseInt(req.body.attrtype1) || 0,
+                attrvalue1: parseInt(req.body.attrvalue1) || 0,
+                attrtype2: parseInt(req.body.attrtype2) || 0,
+                attrvalue2: parseInt(req.body.attrvalue2) || 0,
+                attrtype3: parseInt(req.body.attrtype3) || 0,
+                attrvalue3: parseInt(req.body.attrvalue3) || 0,
+                attrtype4: parseInt(req.body.attrtype4) || 0,
+                attrvalue4: parseInt(req.body.attrvalue4) || 0,
+                attrtype5: parseInt(req.body.attrtype5) || 0,
+                attrvalue5: parseInt(req.body.attrvalue5) || 0,
+                attrtype6: parseInt(req.body.attrtype6) || 0,
+                attrvalue6: parseInt(req.body.attrvalue6) || 0
+            };
+
+            await repository.addToWebStash(itemData);
             res.json({ success: true, message: 'Item wurde in das Web-Lager des Spielers gesendet.' });
         } catch (err) {
             console.error("Gift Item Error:", err);
