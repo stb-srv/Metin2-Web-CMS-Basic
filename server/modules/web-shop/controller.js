@@ -207,23 +207,35 @@ class WebShopController {
     async giveDr(req, res) {
         if (!req.adminPermissions.can_give_gifts) return res.status(403).json({ success: false, message: 'Fehlende Berechtigung.' });
         const { target_account_id, amount } = req.body;
-        if (!target_account_id || !amount || amount <= 0) return res.status(400).json({ success: false, message: 'Bitte gültigen Account und Menge angeben.' });
+        const parsedAmount = parseInt(amount);
+        if (!target_account_id || !parsedAmount || parsedAmount <= 0 || parsedAmount > 1000000) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Bitte gültige Account-ID und Menge (1 - 1.000.000) angeben.' 
+            });
+        }
         
         const { s } = db;
         const colDR = process.env.DB_COLUMN_DR || 'coins';
-        await db.query(`UPDATE ${s('account')}.account SET ${colDR} = ${colDR} + ? WHERE id = ?`, [amount, target_account_id]);
-        res.json({ success: true, message: `${amount} DR wurden erfolgreich gutgeschrieben!` });
+        await db.query(`UPDATE ${s('account')}.account SET ${colDR} = ${colDR} + ? WHERE id = ?`, [parsedAmount, target_account_id]);
+        res.json({ success: true, message: `${parsedAmount} DR wurden erfolgreich gutgeschrieben!` });
     }
 
     async giveDm(req, res) {
         if (!req.adminPermissions.can_give_gifts) return res.status(403).json({ success: false, message: 'Fehlende Berechtigung.' });
         const { target_account_id, amount } = req.body;
-        if (!target_account_id || !amount || amount <= 0) return res.status(400).json({ success: false, message: 'Bitte gültigen Account und Menge angeben.' });
+        const parsedAmount = parseInt(amount);
+        if (!target_account_id || !parsedAmount || parsedAmount <= 0 || parsedAmount > 1000000) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Bitte gültige Account-ID und Menge (1 - 1.000.000) angeben.' 
+            });
+        }
         
         const { s } = db;
         const colDM = process.env.DB_COLUMN_DM || 'cash';
-        await db.query(`UPDATE ${s('account')}.account SET ${colDM} = COALESCE(${colDM}, 0) + ? WHERE id = ?`, [amount, target_account_id]);
-        res.json({ success: true, message: `${amount} DM wurden erfolgreich gutgeschrieben!` });
+        await db.query(`UPDATE ${s('account')}.account SET ${colDM} = COALESCE(${colDM}, 0) + ? WHERE id = ?`, [parsedAmount, target_account_id]);
+        res.json({ success: true, message: `${parsedAmount} DM wurden erfolgreich gutgeschrieben!` });
     }
     async saveCategory(req, res) {
         if (!req.adminPermissions.can_manage_shop) return res.status(403).json({ success: false, message: 'Berechtigung fehlt.' });
