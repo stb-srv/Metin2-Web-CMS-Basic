@@ -22,11 +22,12 @@ class AuthController {
 
         const hashedPassword = hashPassword(password);
         const webHash = await bcryptHash(password);
+        const hashedAnswer = await bcryptHash(answer1.toLowerCase().trim());
 
         await db.query(`
             INSERT INTO ${s('account')}.account (login, password, web_pass_hash, email, social_id, real_name, question1, answer1, create_time, status) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'OK')
-        `, [username, hashedPassword, webHash, email, social_id || '1234567', real_name, question1, answer1]);
+        `, [username, hashedPassword, webHash, email, social_id || '1234567', real_name, question1, hashedAnswer]);
 
         res.status(201).json({ success: true, message: 'Registrierung erfolgreich!' });
     }
@@ -236,7 +237,8 @@ class AuthController {
             return res.status(401).json({ success: false, message: 'Passwort ist inkorrekt.' });
         }
 
-        await db.query(`UPDATE ${s('account')}.account SET question1 = ?, answer1 = ? WHERE id = ?`, [question1, answer1, req.accountId]);
+        const hashedAnswer = await bcryptHash(answer1.toLowerCase().trim());
+        await db.query(`UPDATE ${s('account')}.account SET question1 = ?, answer1 = ? WHERE id = ?`, [question1, hashedAnswer, req.accountId]);
         res.json({ success: true, message: 'Sicherheitsfrage erfolgreich aktualisiert!' });
     }
 
