@@ -16,7 +16,12 @@ const PORT = process.env.PORT || 3000;
 
 // Security Check: JWT Secret
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'secret') {
-    logger.warn('⚠️  JWT_SECRET is either not set or using the default "secret". This is unsafe for production!');
+    if (process.env.NODE_ENV === 'production') {
+        logger.error('FATAL: JWT_SECRET is not set or uses default value. Exiting for security.');
+        process.exit(1);
+    } else {
+        logger.warn('⚠️  JWT_SECRET is either not set or using the default "secret". This is unsafe for production!');
+    }
 }
 
 // Trust proxy for reverse proxies (e.g. Nginx, Cloudflare) - Required for express-rate-limit
