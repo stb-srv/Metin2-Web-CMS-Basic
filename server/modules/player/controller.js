@@ -2,9 +2,22 @@ const repository = require('./repository');
 
 class PlayerController {
     async searchPlayer(req, res) {
-        if (!req.adminPermissions.can_manage_players) return res.json({ success: true, players: [] });
-        const players = await repository.searchPlayer(req.query.q);
-        res.json({ success: true, players });
+        try {
+            if (!req.adminPermissions.can_manage_players) {
+                return res.json({ success: true, players: [] });
+            }
+
+            const q = (req.query.q || '').trim();
+            if (q.length < 2) {
+                return res.json({ success: true, players: [] });
+            }
+
+            const players = await repository.searchPlayer(q);
+            res.json({ success: true, players });
+        } catch (err) {
+            console.error('[Player] Error in searchPlayer:', err);
+            res.status(500).json({ success: false, message: 'Interner Serverfehler.' });
+        }
     }
 
     async getHistory(req, res) {
