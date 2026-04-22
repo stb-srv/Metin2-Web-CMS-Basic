@@ -186,7 +186,7 @@ router.post('/test-db', async (req, res) => {
 
 // POST /api/setup/save-config — Save .env file
 router.post('/save-config', (req, res) => {
-    const { db_host, db_user, db_password, db_port, jwt_secret, port } = req.body;
+    const { db_host, db_user, db_password, db_port, jwt_secret, port, site_name, site_theme, default_lang } = req.body;
 
     const envContent = [
         `# Metin2 Web-Panel Konfiguration`,
@@ -200,7 +200,9 @@ router.post('/save-config', (req, res) => {
         ``,
         `# Server`,
         `PORT=${port || '3000'}`,
-        `SITE_NAME=${req.body.site_name || 'Metin2 Web'}`,
+        `SITE_NAME=${site_name || 'Metin2 Web'}`,
+        `SITE_THEME=${site_theme || 'default'}`,
+        `DEFAULT_LANG=${default_lang || 'en'}`,
         ``,
         `# Sicherheit`,
         `JWT_SECRET=${jwt_secret || generateSecret()}`,
@@ -222,6 +224,42 @@ router.post('/save-config', (req, res) => {
         res.json({ success: true, message: '.env Datei gespeichert!' });
     } catch (e) {
         res.json({ success: false, message: `Fehler beim Speichern: ${e.message}` });
+    }
+});
+
+// POST /api/setup/save-settings — Save settings to DB
+router.post('/save-settings', async (req, res) => {
+    const { site_name, site_theme, default_lang } = req.body;
+    const db = require('../../config/database');
+    const { s } = db;
+
+    try {
+        const settings = {
+            site_name: site_name || 'Metin2 Web',
+            theme_empire: site_theme || 'default',
+            default_language: default_lang || 'en'
+        };
+
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+            for (const [key, value] of Object.entries(settings)) {
+                await connection.query(
+                    `INSERT INTO ${s('website')}.site_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?`,
+                    [key, String(value), String(value)]
+                );
+            }
+            await connection.commit();
+        } catch (err) {
+            await connection.rollback();
+            throw err;
+        } finally {
+            connection.release();
+        }
+
+        res.json({ success: true, message: 'Einstellungen in DB gespeichert.' });
+    } catch (e) {
+        res.json({ success: false, message: `Fehler beim Speichern der Einstellungen: ${e.message}` });
     }
 });
 

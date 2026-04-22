@@ -1,0 +1,205 @@
+/* dragon-dark.css - Epic Gold Fantasy Theme */
+:root.theme-dragon,
+body.theme-dragon {
+    --primary-rgb: 212, 160, 23;
+    --accent-rgb: 251, 191, 36;
+    --primary: rgb(var(--primary-rgb));
+    --accent: rgb(var(--accent-rgb));
+    --primary-hover: #FBBF24;
+    --glass-bg: rgba(8, 15, 30, 0.85);
+    --bg-primary: #080C14;
+    --bg-secondary: rgba(12, 20, 40, 0.90);
+    --border-color: rgba(212, 160, 23, 0.25);
+    --text-primary: #F0E6C8;
+    --text-secondary: #8899AA;
+    --card-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212, 160, 23, 0.1);
+    --glow-primary: 0 0 20px rgba(212, 160, 23, 0.3);
+    --btn-gradient: linear-gradient(135deg, #D4A017, #B8860B);
+    --btn-text: #080C14;
+    --navbar-bg: rgba(5, 8, 18, 0.95);
+    
+    /* Overwrite global variables from style.css */
+    --bg-dark: var(--bg-primary);
+    --text-main: var(--text-primary);
+    --text-muted: var(--text-secondary);
+    --glass-border: var(--border-color);
+}
+
+:root.theme-dragon.light-mode,
+body.theme-dragon.light-mode {
+    --primary-rgb: 180, 120, 10;
+    --accent-rgb: 212, 160, 23;
+    --primary: rgb(var(--primary-rgb));
+    --accent: rgb(var(--accent-rgb));
+    --primary-hover: #D4A017;
+    --glass-bg: rgba(255, 248, 220, 0.90);
+    --bg-primary: #FFF8DC;
+    --bg-secondary: rgba(255, 245, 200, 0.95);
+    --border-color: rgba(180, 120, 10, 0.3);
+    --text-primary: #1A0F00;
+    --text-secondary: #5C4A1E;
+    
+    --bg-dark: var(--bg-primary);
+    --text-main: var(--text-primary);
+    --text-muted: var(--text-secondary);
+    --glass-border: var(--border-color);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Dragon Dark Component Overrides
+   ═══════════════════════════════════════════════════════ */
+
+body.theme-dragon {
+    background-color: var(--bg-primary);
+}
+
+/* Navbar */
+body.theme-dragon .navbar {
+    background: var(--navbar-bg);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(212, 160, 23, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+body.theme-dragon .logo .gradient-text {
+    background: linear-gradient(135deg, #D4A017 0%, #FBBF24 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body.theme-dragon .nav-links a {
+    color: var(--text-secondary);
+}
+
+body.theme-dragon .nav-links a:hover {
+    color: #D4A017;
+    text-shadow: 0 0 10px rgba(212, 160, 23, 0.4);
+}
+
+body.theme-dragon .nav-links a.active {
+    color: #FBBF24;
+    border-bottom: 2px solid #D4A017;
+}
+
+/* Buttons */
+body.theme-dragon .primary-btn {
+    background: var(--btn-gradient) !important;
+    color: var(--btn-text) !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(212, 160, 23, 0.4);
+    border: none;
+    font-weight: 700;
+}
+
+body.theme-dragon .primary-btn:hover {
+    background: linear-gradient(135deg, #FBBF24, #D4A017) !important;
+    box-shadow: 0 6px 20px rgba(212, 160, 23, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Cards / Panels */
+body.theme-dragon .glass-panel,
+body.theme-dragon .shop-card,
+body.theme-dragon .ranking-container,
+body.theme-dragon .news-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(12px);
+}
+
+body.theme-dragon .shop-card:hover,
+body.theme-dragon .news-card:hover {
+    border-color: rgba(212, 160, 23, 0.5);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 160, 23, 0.2);
+}
+
+/* Item Shop Specials */
+body.theme-dragon .item-icon {
+    background: radial-gradient(circle, rgba(212, 160, 23, 0.15), transparent);
+    border-color: rgba(212, 160, 23, 0.3);
+}
+
+body.theme-dragon .currency-badge.badge-dr {
+    color: #FBBF24;
+    font-weight: 700;
+}
+
+/* Ranking Table */
+body.theme-dragon .ranking-table thead tr {
+    background: rgba(212, 160, 23, 0.1);
+}
+
+body.theme-dragon .ranking-table th {
+    color: #D4A017;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+body.theme-dragon .ranking-table tr:nth-child(even) {
+    background: rgba(12, 20, 40, 0.5);
+}
+
+body.theme-dragon .ranking-table tr:hover {
+    background: rgba(212, 160, 23, 0.08);
+}
+
+body.theme-dragon .rank-row-1 {
+    border-left: 4px solid #D4A017;
+    background: linear-gradient(90deg, rgba(212, 160, 23, 0.1), transparent) !important;
+}
+
+body.theme-dragon .rank-row-2 {
+    border-left: 4px solid #94A3B8;
+}
+
+body.theme-dragon .rank-row-3 {
+    border-left: 4px solid #CD7F32;
+}
+
+/* Server Status Dot Glow */
+body.theme-dragon .status-dot.online {
+    background-color: #22C55E;
+    box-shadow: 0 0 10px #22C55E, 0 0 20px rgba(34, 197, 94, 0.5);
+    animation: dragon-pulse-green 2s infinite;
+}
+
+body.theme-dragon .status-dot.medium {
+    background-color: #F59E0B;
+    box-shadow: 0 0 10px #F59E0B, 0 0 20px rgba(245, 158, 11, 0.5);
+    animation: dragon-pulse-yellow 2s infinite;
+}
+
+@keyframes dragon-pulse-green {
+    0% { box-shadow: 0 0 5px #22C55E; }
+    50% { box-shadow: 0 0 15px #22C55E, 0 0 25px rgba(34, 197, 94, 0.6); }
+    100% { box-shadow: 0 0 5px #22C55E; }
+}
+
+@keyframes dragon-pulse-yellow {
+    0% { box-shadow: 0 0 5px #F59E0B; }
+    50% { box-shadow: 0 0 15px #F59E0B, 0 0 25px rgba(245, 158, 11, 0.6); }
+    100% { box-shadow: 0 0 5px #F59E0B; }
+}
+
+/* Scrollbar */
+body.theme-dragon::-webkit-scrollbar {
+    width: 10px;
+}
+
+body.theme-dragon::-webkit-scrollbar-track {
+    background: #080C14;
+}
+
+body.theme-dragon::-webkit-scrollbar-thumb {
+    background: rgba(212, 160, 23, 0.4);
+    border-radius: 5px;
+    border: 2px solid #080C14;
+}
+
+body.theme-dragon::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 160, 23, 0.7);
+}
