@@ -87,27 +87,16 @@ class ShopPaymentController {
     async approvePayment(req, res) {
         try {
             const { id } = req.params;
-            const payment = await repo.getPaymentById(id);
+            const result = await repo.approvePaymentTransaction(id);
 
-            if (!payment) {
+            if (!result.success && result.code === 'NOT_FOUND') {
                 return res.status(404).json({ success: false, message: 'Zahlung nicht gefunden.' });
             }
-
-            if (payment.status !== 'pending') {
+            if (!result.success && result.code === 'ALREADY_PROCESSED') {
                 return res.status(400).json({ success: false, message: 'Zahlung wurde bereits bearbeitet.' });
             }
 
-            // 1. Grant coins
-            const granted = await repo.grantCoins(payment.account_id, payment.coins);
-            if (!granted) {
-                return res.status(500).json({ success: false, message: 'Fehler beim Gutschreiben der Coins.' });
-            }
-
-            // 2. Update status
-            await repo.updateStatus(id, 'approved');
-
             res.json({ success: true, message: 'Zahlung genehmigt und Coins gutgeschrieben.' });
-
         } catch (err) {
             console.error('[ShopPayments] Error approving payment:', err);
             res.status(500).json({ success: false, message: 'Interner Serverfehler' });

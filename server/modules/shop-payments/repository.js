@@ -66,6 +66,53 @@ class ShopPaymentRepository {
         );
         return result.affectedRows > 0;
     }
+
+    async approvePaymentTransaction(id) {
+        const { s } = db;
+        const conn = await db.getConnection();
+        try {
+            await conn.beginTransaction();
+
+            // Zahlung sperren (FOR UPDATE verhindert parallele Genehmigung)
+            const [rows] = await conn.query(
+                `SELECT * FROM ${s('website')}.shop_payments WHERE id = ? FOR UPDATE`,
+                [id]
+            );
+
+            if (rows.length === 0) {
+                await conn.rollback();
+                return { success: false, code: 'NOT_FOUND' };
+            }
+
+            const payment = rows[0];
+
+            if (payment.status !== 'pending') {
+                await conn.rollback();
+                return { success: false, code: 'ALREADY_PROCESSED' };
+            }
+
+            // Coins gutschreiben
+            const column = process.env.DB_COLUMN_DR || 'coins';
+            await conn.query(
+                `UPDATE ${s('account')}.account SET ${column} = ${column} + ? WHERE id = ?`,
+                [payment.coins, payment.account_id]
+            );
+
+            // Status aktualisieren
+            await conn.query(
+                `UPDATE ${s('website')}.shop_payments SET status = 'approved' WHERE id = ?`,
+                [id]
+            );
+
+            await conn.commit();
+            return { success: true, payment };
+        } catch (err) {
+            await conn.rollback();
+            throw err;
+        } finally {
+            conn.release();
+        }
+    }
 }
 
 module.exports = new ShopPaymentRepository();
