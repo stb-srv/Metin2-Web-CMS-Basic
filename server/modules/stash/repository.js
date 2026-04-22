@@ -185,6 +185,11 @@ class StashRepository {
         return rows[0];
     }
 
+    /**
+     * HINWEIS: Das Safebox-Passwort wird absichtlich im Klartext gespeichert.
+     * Der Metin2-Gameserver liest und vergleicht dieses Passwort direkt aus der DB.
+     * Eine Verschlüsselung würde den Gameserver-Login für die Safebox brechen.
+     */
     async updateSafeboxPassword(accountId, newPassword) {
         const { s } = db;
         const [result] = await db.query(
@@ -194,6 +199,11 @@ class StashRepository {
         return result.affectedRows > 0;
     }
 
+    /**
+     * HINWEIS: Das Safebox-Passwort wird absichtlich im Klartext gespeichert.
+     * Der Metin2-Gameserver liest und vergleicht dieses Passwort direkt aus der DB.
+     * Eine Verschlüsselung würde den Gameserver-Login für die Safebox brechen.
+     */
     async ensureSafeboxExists(accountId) {
         const { s } = db;
         // Check if exists
