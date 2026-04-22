@@ -1,6 +1,7 @@
 const db = require('../../config/database');
 
 class StashRepository {
+    static _lastCleanup = 0;
     async getStash(accountId) {
         const { s } = db;
         const [rows] = await db.query(`
@@ -27,7 +28,13 @@ class StashRepository {
 
     async getTrash(accountId) {
         // Auto-cleanup items older than 7 days
-        await this.cleanupOldDeleted();
+        const now = Date.now();
+        if (now - StashRepository._lastCleanup > 10 * 60 * 1000) { // alle 10 Minuten
+            StashRepository._lastCleanup = now;
+            this.cleanupOldDeleted().catch(e =>
+                console.error('[Stash] Cleanup error:', e)
+            );
+        }
 
         const { s } = db;
         const [rows] = await db.query(`
