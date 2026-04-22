@@ -26,4 +26,12 @@ const registerLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-module.exports = { apiLimiter, authLimiter, registerLimiter };
+const safeboxLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // max 10 attempts per 15 minutes
+    message: { success: false, message: 'Zu viele Versuche. Bitte warte 15 Minuten.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+module.exports = { apiLimiter, authLimiter, registerLimiter, safeboxLimiter };

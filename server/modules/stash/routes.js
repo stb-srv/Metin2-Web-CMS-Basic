@@ -4,6 +4,8 @@ const controller = require('./controller');
 const isAuth = require('../../middleware/auth');
 const isAdmin = require('../../middleware/adminCheck');
 
+const { safeboxLimiter } = require('../../config/rateLimiters');
+
 router.get('/', isAuth, controller.getStash.bind(controller));
 router.get('/trash', isAuth, controller.getTrash.bind(controller));
 router.post('/claim/:id', isAuth, controller.claimItem.bind(controller));
@@ -17,6 +19,6 @@ router.post('/bulk-permanent', isAuth, controller.bulkPermanentDelete.bind(contr
 router.post('/admin/gift', isAdmin, controller.adminGift.bind(controller));
 
 // Storage Password
-router.post('/change-password', isAuth, controller.changeStoragePassword.bind(controller));
+router.post('/change-password', isAuth, safeboxLimiter, controller.changeStoragePassword.bind(controller));
 
 module.exports = router;
