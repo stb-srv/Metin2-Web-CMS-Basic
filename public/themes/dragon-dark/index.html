@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Dark | Metin2 Web</title>
+    
+    <!-- Dragon Dark Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core CSS (Dragon Dark) -->
+    <link rel="stylesheet" href="css/dragon-dark.css">
+    
+    <!-- Theme Engine JS -->
+    <script src="/js/theme.js"></script>
+</head>
+
+<body>
+    <div class="bg-overlay"></div>
+    <div class="particles" id="particles-js"></div>
+
+    <nav class="navbar"></nav>
+
+    <main class="container hero-section" style="padding-top: 5rem; min-height: 80vh; display: flex; align-items: center;">
+        <div style="display: grid; grid-template-columns: 1fr 400px; gap: 4rem; align-items: center; width: 100%;">
+            
+            <div class="hero-text">
+                <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem;">
+                    <span data-i18n="hero.welcome">Willkommen auf</span><br>
+                    <span class="gradient-text" id="heroSiteName" style="font-size: 4.5rem;">Dragon Dark</span>
+                </h1>
+                <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 600px;" data-i18n="hero.subtitle">
+                    Das nächste Kapitel deines Metin2 Abenteuers. Erlebe eine neue Ära von Action, Handel und PvP unter dem Schutz der Drachen.
+                </p>
+            </div>
+
+            <div class="auth-box" id="authBox">
+                <!-- Login Form -->
+                <form id="loginForm" class="glass-panel active-form">
+                    <h2 data-i18n="auth.login" style="margin-bottom: 2rem; text-align: center;">Krieger-Login</h2>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="loginUsername" data-i18n="auth.username" placeholder="Benutzername" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" data-i18n="auth.password" placeholder="Passwort" required>
+                    </div>
+                    <button type="submit" class="btn primary-btn" style="width: 100%; margin-top: 1rem;" data-i18n="auth.btn_login">In die Welt eintreten</button>
+                    
+                    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+                        <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+                            <span data-i18n="auth.no_account">Noch kein Krieger?</span> 
+                            <span onclick="toggleAuth('register')" style="color: var(--gold-bright); cursor: pointer; font-weight: 700;">Registrieren</span>
+                        </p>
+                        <p onclick="toggleAuth('forgot')" style="color: var(--text-secondary); cursor: pointer; text-decoration: underline; font-size: 0.8rem;" data-i18n="auth.forgot_password">Passwort vergessen?</p>
+                    </div>
+                    <div id="loginMsg" class="form-msg" style="margin-top: 1rem; text-align: center;"></div>
+                </form>
+
+                <!-- Forgot Password Form -->
+                <form id="forgotForm" class="glass-panel" style="display: none;">
+                    <h2 data-i18n="auth.forgot_title" style="margin-bottom: 1.5rem; text-align: center;">Gedächtnis-Segen</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; text-align: center;">Gib deine Daten ein, um dein Passwort wiederherzustellen.</p>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="forgotUsername" placeholder="Benutzername" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="forgotEmail" placeholder="E-Mail Adresse" required>
+                    </div>
+                    <button type="submit" class="btn primary-btn" style="width: 100%;" data-i18n="auth.btn_reset">Link anfordern</button>
+                    <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+                        <span onclick="toggleAuth('login')" style="color: var(--text-secondary); cursor: pointer;" data-i18n="auth.back_login">Zurück zum Login</span>
+                    </p>
+                    <div id="forgotMsg" class="form-msg"></div>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="glass-panel" style="display: none;">
+                    <h2 data-i18n="auth.register" style="margin-bottom: 1.5rem; text-align: center;">Eid ablegen</h2>
+                    
+                    <div style="max-height: 400px; overflow-y: auto; padding-right: 5px; margin-bottom: 1.5rem;">
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="regUsername" data-i18n="auth.username" placeholder="Benutzername" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-id-card"></i>
+                            <input type="text" id="regRealName" data-i18n="auth.real_name" placeholder="Vollständiger Name" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="regEmail" data-i18n="auth.email" placeholder="E-Mail Adresse" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="regPassword" data-i18n="auth.password" placeholder="Passwort" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-key"></i>
+                            <input type="text" id="regSocialID" data-i18n="auth.social_id" placeholder="Löschcode (7 Zeichen)" maxlength="7" minlength="7" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn primary-btn" style="width: 100%;" data-i18n="auth.btn_register">Account Erstellen</button>
+                    <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+                        <span data-i18n="auth.have_account">Bereits ein Krieger?</span> 
+                        <span onclick="toggleAuth('login')" style="color: var(--gold-bright); cursor: pointer; font-weight: 700;" data-i18n="auth.toggle_login">Einloggen</span>
+                    </p>
+                    <div id="regMsg" class="form-msg" style="margin-top: 1rem;"></div>
+                </form>
+
+                <!-- Profile Block (Shown when logged in) -->
+                <div id="profileBox" class="glass-panel" style="display: none; text-align: center;">
+                    <h2 data-i18n="navbar.account" style="margin-bottom: 2rem;">Deine Macht</h2>
+                    <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 2rem;">
+                        <p style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 1rem;">
+                            <i class="fas fa-dragon" style="color: var(--gold-primary); margin-right: 10px;"></i>
+                            <span id="pUsername">-</span>
+                        </p>
+                        <div style="display: flex; justify-content: center; gap: 1.5rem; font-size: 1rem;">
+                            <span title="Drachenmünzen"><i class="fas fa-coins text-gold"></i> <span id="pCoins">0</span></span>
+                            <span title="Drachenmarken"><i class="fas fa-certificate text-magic"></i> <span id="pCash">0</span></span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; gap: 0.75rem;">
+                        <a href="/shop" class="btn primary-btn" style="width: 100%;"><i class="fas fa-shopping-cart"></i> Zum Item Shop</a>
+                        <a href="/account" class="btn secondary-btn" style="width: 100%;"><i class="fas fa-user-shield"></i> Account-Zentrum</a>
+                        <button onclick="logout()" class="btn secondary-btn" style="width: 100%; border-color: rgba(239, 68, 68, 0.3); color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Verlassen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- News Section -->
+    <section class="container" style="padding: 4rem 0;" id="newsSection">
+        <h2 style="font-size: 2.5rem; margin-bottom: 3rem; text-align: center;">
+            <i class="fas fa-scroll" style="margin-right: 15px;"></i> Chroniken & Updates
+        </h2>
+        <div class="shop-grid" id="newsGrid">
+            <!-- News items dynamically loaded -->
+            <div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="dynamic-footer"></footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/dragon-theme.js"></script>
+    
+    <!-- Core CMS Scripts -->
+    <script src="/js/core/modal.js"></script>
+    <script src="/js/core/i18n.js"></script>
+    <script src="/js/core/api.js"></script>
+    <script src="/js/core/state.js"></script>
+    <script src="/js/core/auth.js"></script>
+    <script src="/js/core/main.js"></script>
+    <script src="/js/core/navbar.js"></script>
+    <script src="/js/core/footer.js"></script>
+    <script src="/js/core/cms.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Dark | Rangliste</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/dragon-dark.css">
+    <script src="/js/theme.js"></script>
+</head>
+
+<body>
+    <div class="bg-overlay"></div>
+    <div class="particles" id="particles-js"></div>
+
+    <nav class="navbar"></nav>
+
+    <main class="container" style="padding: 4rem 1.5rem; min-height: 85vh;">
+        <div class="glass-panel" style="max-width: 1100px; margin: 0 auto; padding: 3rem;">
+            
+            <div style="text-align: center; margin-bottom: 3.5rem;">
+                <i class="fas fa-crown" style="font-size: 4rem; color: var(--gold-bright); margin-bottom: 1.5rem; filter: drop-shadow(0 0 15px rgba(212,160,23,0.4));"></i>
+                <h1 style="font-size: 3rem; margin-bottom: 0.5rem;">Halle der <span class="gradient-text">Helden</span></h1>
+                <p style="color: var(--text-secondary); font-size: 1.1rem;">Die ruhmreichsten Krieger und mächtigsten Gilden des Kontinents.</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 2rem;">
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn primary-btn" id="btnRankPlayer" onclick="switchRanking('player')"><i class="fas fa-user"></i> Krieger</button>
+                    <button class="btn secondary-btn" id="btnRankGuild" onclick="switchRanking('guild')"><i class="fas fa-fort-awesome"></i> Gilden</button>
+                </div>
+                
+                <div class="input-group" style="margin-bottom: 0; min-width: 300px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="rankingSearch" placeholder="Name suchen..." oninput="debounceSearch()">
+                </div>
+            </div>
+
+            <div class="ranking-table-wrap">
+                <table class="ranking-table">
+                    <thead id="rankingTableHeader">
+                        <!-- Dynamic Header -->
+                    </thead>
+                    <tbody id="rankingTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 5rem;">
+                                <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--gold-primary); margin-bottom: 1.5rem;"></i>
+                                <p style="color: var(--text-secondary);">Beschwöre Rangliste...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="pagination" style="display: flex; justify-content: center; gap: 0.75rem; margin-top: 3rem;">
+                <!-- Pagination via JS -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="dynamic-footer"></footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/dragon-theme.js"></script>
+    
+    <script src="/js/core/modal.js"></script>
+    <script src="/js/core/i18n.js"></script>
+    <script src="/js/core/api.js"></script>
+    <script src="/js/core/state.js"></script>
+    <script src="/js/core/auth.js"></script>
+    <script src="/js/core/main.js"></script>
+    <script src="/js/core/navbar.js"></script>
+    <script src="/js/core/footer.js"></script>
+
+    <script>
+        let currentRankType = 'player';
+        let currentPage = 1;
+        let searchQuery = '';
+        let searchTimeout;
+
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchQuery = document.getElementById('rankingSearch').value;
+                currentPage = 1;
+                loadRanking();
+            }, 500);
+        }
+
+        function switchRanking(type) {
+            currentRankType = type;
+            currentPage = 1;
+            searchQuery = '';
+            document.getElementById('rankingSearch').value = '';
+            
+            document.getElementById('btnRankPlayer').className = type === 'player' ? 'btn primary-btn' : 'btn secondary-btn';
+            document.getElementById('btnRankGuild').className = type === 'guild' ? 'btn primary-btn' : 'btn secondary-btn';
+            
+            const header = document.querySelector('#rankingTableHeader');
+            if (type === 'player') {
+                header.innerHTML = `<tr>
+                        <th>#</th>
+                        <th>Reich</th>
+                        <th>Name</th>
+                        <th>Gilde</th>
+                        <th>Klasse</th>
+                        <th>Level</th>
+                        <th>EXP</th>
+                        <th>Spielzeit</th>
+                    </tr>`;
+            } else {
+                header.innerHTML = `<tr>
+                        <th>#</th>
+                        <th>Reich</th>
+                        <th>Gildenname</th>
+                        <th>Anführer</th>
+                        <th>Level</th>
+                        <th>Punkte</th>
+                        <th>S / U / N</th>
+                    </tr>`;
+            }
+            loadRanking();
+        }
+
+        async function loadRanking() {
+            const tbody = document.getElementById('rankingTableBody');
+            const colCount = currentRankType === 'player' ? 8 : 7;
+            tbody.innerHTML = `<tr><td colspan="${colCount}" style="text-align: center; padding: 4rem;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--gold-primary);"></i></td></tr>`;
+            
+            try {
+                const endpoint = currentRankType === 'player' ? 'players' : 'guilds';
+                const res = await fetch(`${API_URL}/ranking/${endpoint}?page=${currentPage}&q=${encodeURIComponent(searchQuery)}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    tbody.innerHTML = '';
+                    if (data.ranking.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="${colCount}" style="text-align:center; padding: 3rem; color: var(--text-secondary);">Keine Legenden unter diesem Namen gefunden.</td></tr>`;
+                        renderPagination(0);
+                        return;
+                    }
+
+                    data.ranking.forEach((entry, index) => {
+                        const globalIndex = ((currentPage - 1) * 10) + index;
+                        const rankClass = (globalIndex < 3) ? `rank-${globalIndex + 1}` : '';
+                        
+                        let rankIcon = globalIndex + 1;
+                        if (globalIndex === 0) rankIcon = '<i class="fas fa-crown text-gold" style="font-size: 1.2rem;"></i>';
+                        else if (globalIndex === 1) rankIcon = '<i class="fas fa-medal" style="color: #94A3B8; font-size: 1.1rem;"></i>';
+                        else if (globalIndex === 2) rankIcon = '<i class="fas fa-medal" style="color: #CD7F32; font-size: 1.1rem;"></i>';
+
+                        const tr = document.createElement('tr');
+                        if (rankClass) tr.className = rankClass;
+                        
+                        let empireHtml = ' - ';
+                        const flagStyle = 'width: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); vertical-align: middle;';
+                        if (entry.empire === 1) empireHtml = `<img src="/images/flags/Flag_red.png" title="Shinsoo" style="${flagStyle}">`;
+                        else if (entry.empire === 2) empireHtml = `<img src="/images/flags/Flag_yellow.png" title="Chunjo" style="${flagStyle}">`;
+                        else if (entry.empire === 3) empireHtml = `<img src="/images/flags/Flag_blue.png" title="Jinno" style="${flagStyle}">`;
+
+                        if (currentRankType === 'player') {
+                            const raceId = parseInt(entry.job);
+                            let jobName = "Unbekannt";
+                            if ([0, 4].includes(raceId)) jobName = "Krieger";
+                            else if ([1, 5].includes(raceId)) jobName = "Ninja";
+                            else if ([2, 6].includes(raceId)) jobName = "Sura";
+                            else if ([3, 7].includes(raceId)) jobName = "Schamane";
+                            else if (raceId === 8) jobName = "Lykaner";
+
+                            tr.innerHTML = `
+                                <td><strong style="color: #fff;">${rankIcon}</strong></td>
+                                <td style="text-align: center;">${empireHtml}</td>
+                                <td><span style="font-weight: 700; color: var(--gold-bright);">${entry.name}</span></td>
+                                <td style="color: var(--text-secondary); font-size: 0.9rem;">${entry.guild_name || ' - '}</td>
+                                <td style="color: var(--text-secondary);">${jobName}</td>
+                                <td style="color: #fff; font-weight: 800;">${entry.level}</td>
+                                <td style="color: var(--gold-primary); font-size: 0.85rem;">${entry.exp.toLocaleString()}</td>
+                                <td style="color: var(--text-secondary); font-size: 0.85rem;">${Math.floor(entry.playtime / 60)}h</td>
+                            `;
+                        } else {
+                            tr.innerHTML = `
+                                <td><strong style="color: #fff;">${rankIcon}</strong></td>
+                                <td style="text-align: center;">${empireHtml}</td>
+                                <td><span style="font-weight: 700; color: var(--gold-bright);">${entry.name}</span></td>
+                                <td style="color: var(--text-secondary); font-size: 0.9rem;"><i class="fas fa-crown text-gold" style="font-size: 0.7rem; margin-right: 5px;"></i>${entry.master_name || 'Unbekannt'}</td>
+                                <td style="color: #fff; font-weight: 800;">${entry.level}</td>
+                                <td style="color: var(--gold-primary); font-weight: 700;">${entry.ladder_point.toLocaleString()}</td>
+                                <td style="font-size: 0.85rem;"><span style="color: var(--success);">${entry.win}</span> / <span style="color: var(--text-secondary);">${entry.draw}</span> / <span style="color: var(--danger);">${entry.loss}</span></td>
+                            `;
+                        }
+                        tbody.appendChild(tr);
+                    });
+                    renderPagination(data.pagination.totalPages);
+                }
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="${colCount}" style="text-align:center; padding: 3rem; color: var(--danger);">Fehler beim Rufen der Toten. (Netzwerkfehler)</td></tr>`;
+            }
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pagination');
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const createBtn = (label, page, active = false, disabled = false) => {
+                const btn = document.createElement('button');
+                btn.className = active ? 'btn primary-btn' : 'btn secondary-btn';
+                btn.style.padding = '0.5rem 1rem';
+                btn.style.minWidth = '45px';
+                btn.innerHTML = label;
+                if (disabled) btn.disabled = true;
+                else btn.onclick = () => { currentPage = page; loadRanking(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+                return btn;
+            };
+
+            container.appendChild(createBtn('<i class="fas fa-angle-left"></i>', currentPage - 1, false, currentPage === 1));
+            
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+            for (let i = startPage; i <= endPage; i++) {
+                container.appendChild(createBtn(i, i, i === currentPage));
+            }
+
+            container.appendChild(createBtn('<i class="fas fa-angle-right"></i>', currentPage + 1, false, currentPage === totalPages));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchRanking('player'); 
+        });
+    </script>
+</body>
+
+</html>
