@@ -166,6 +166,9 @@ const maintenanceGuard = async (req, res, next) => {
 
 app.use(maintenanceGuard);
 
+// Serve theme-specific assets (CSS, JS, Images)
+app.use('/themes/dragon-dark', express.static(path.join(__dirname, 'public/themes/dragon-dark')));
+
 // Serve static files (Frontend)
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
