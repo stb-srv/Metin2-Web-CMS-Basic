@@ -20,6 +20,7 @@ class WebShopController {
     async buyItem(req, res) {
         const { item_id, destination } = req.body;
         const account_id = req.accountId;
+        const clamp = (val) => Math.max(-32768, Math.min(32767, parseInt(val) || 0));
 
         if (!item_id) return res.status(400).json({ success: false, message: 'Ungültige Kaufanfrage.' });
 
@@ -116,7 +117,7 @@ class WebShopController {
                         attrtype3, attrvalue3, attrtype4, attrvalue4, attrtype5, attrvalue5, attrtype6, attrvalue6
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `;
-                const clamp = (val) => Math.max(-32768, Math.min(32767, parseInt(val) || 0));
+
                 await connection.query(insertStashQuery, [
                     account_id, item.vnum, item.count,
                     item.socket0 || 0, item.socket1 || 0, item.socket2 || 0,
@@ -136,7 +137,7 @@ class WebShopController {
                     attrtype3, attrvalue3, attrtype4, attrvalue4, attrtype5, attrvalue5, attrtype6, attrvalue6
                 ) VALUES (?, 'MALL', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
-            const clamp = (val) => Math.max(-32768, Math.min(32767, parseInt(val) || 0));
+
             await connection.query(insertItemQuery, [
                 account_id, freePos, item.count, item.vnum,
                 item.socket0 || 0, item.socket1 || 0, item.socket2 || 0,
