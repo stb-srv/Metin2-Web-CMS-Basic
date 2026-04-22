@@ -41,9 +41,11 @@ class AdminRepository {
             await connection.beginTransaction();
             await connection.query(`DELETE FROM ${s('website')}.role_permissions WHERE role_id = ?`, [roleId]);
             if (permissions && permissions.length > 0) {
-                for (const key of permissions) {
-                    await connection.query(`INSERT INTO ${s('website')}.role_permissions (role_id, permission_key) VALUES (?, ?)`, [roleId, key]);
-                }
+                const values = permissions.map(key => [roleId, key]);
+                await connection.query(
+                    `INSERT INTO ${s('website')}.role_permissions (role_id, permission_key) VALUES ?`,
+                    [values]
+                );
             }
             await connection.commit();
         } catch (err) {
