@@ -166,18 +166,6 @@ const maintenanceGuard = async (req, res, next) => {
 
 app.use(maintenanceGuard);
 
-// HTML-Seiten themed ausliefern
-app.get('/', serveThemedFile('index.html'));
-app.get('/index.html', serveThemedFile('index.html'));
-app.get('/shop.html', serveThemedFile('shop.html'));
-app.get('/ranking.html', serveThemedFile('ranking.html'));
-app.get('/account.html', serveThemedFile('account.html'));
-app.get('/stash.html', serveThemedFile('stash.html'));
-app.get('/vote.html', serveThemedFile('vote.html'));
-app.get('/news.html', serveThemedFile('news.html'));
-app.get('/downloads.html', serveThemedFile('downloads.html'));
-app.get('/buy-coins.html', serveThemedFile('buy-coins.html'));
-
 // Serve static files (Frontend)
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
@@ -209,9 +197,17 @@ async function startServer() {
     try {
         // 1. Initialize all modules (dynamic discovery)
         await moduleManager.loadModules(app);
-        logger.info('[CMS] All modules initialized and routes mounted.');
-
-        // 2. Setup Guard Redirect (moved to top of file)
+        // Theme-Routen - nach Modulen aber vor Catch-all:
+        app.get('/', serveThemedFile('index.html'));
+        app.get('/index.html', serveThemedFile('index.html'));
+        app.get('/shop.html', serveThemedFile('shop.html'));
+        app.get('/ranking.html', serveThemedFile('ranking.html'));
+        app.get('/account.html', serveThemedFile('account.html'));
+        app.get('/stash.html', serveThemedFile('stash.html'));
+        app.get('/vote.html', serveThemedFile('vote.html'));
+        app.get('/news.html', serveThemedFile('news.html'));
+        app.get('/downloads.html', serveThemedFile('downloads.html'));
+        app.get('/buy-coins.html', serveThemedFile('buy-coins.html'));
 
         // 3. Dedicated News Article Page
         app.get('/news/:id', (req, res) => {

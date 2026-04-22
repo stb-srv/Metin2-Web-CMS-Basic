@@ -59,6 +59,9 @@ async function initDb() {
             logger.info(`✓ Database schema is up to date.`);
         }
 
+        // Bugfix: Ensure active_theme entry exists
+        await db.query(`INSERT IGNORE INTO ${s('website')}.site_settings (setting_key, setting_value) VALUES ('active_theme', 'classic')`);
+
     } catch (err) {
         logger.error("Error during database initialization:", err);
         throw err;
