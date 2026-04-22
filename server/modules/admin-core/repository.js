@@ -67,9 +67,25 @@ class AdminRepository {
 
     async assignAccountRole(accountId, roleId) {
         const { s } = db;
-        await db.query(`DELETE FROM ${s('website')}.account_roles WHERE account_id = ?`, [accountId]);
-        if (roleId) {
-            await db.query(`INSERT INTO ${s('website')}.account_roles (account_id, role_id) VALUES (?, ?)`, [accountId, roleId]);
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+            await connection.query(
+                `DELETE FROM ${s('website')}.account_roles WHERE account_id = ?`,
+                [accountId]
+            );
+            if (roleId) {
+                await connection.query(
+                    `INSERT INTO ${s('website')}.account_roles (account_id, role_id) VALUES (?, ?)`,
+                    [accountId, roleId]
+                );
+            }
+            await connection.commit();
+        } catch (err) {
+            await connection.rollback();
+            throw err;
+        } finally {
+            connection.release();
         }
     }
 
