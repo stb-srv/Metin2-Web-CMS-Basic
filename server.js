@@ -144,8 +144,8 @@ const maintenanceGuard = async (req, res, next) => {
                     
                     if (gms.length > 0) {
                         const authority = gms[0].mAuthority;
-                        // Recognition by Rank OR Name Prefix
-                        if (gmRanks.includes(authority) || decoded.username.startsWith('[')) {
+                        // Recognition by Rank
+                        if (gmRanks.includes(authority)) {
                             return next();
                         }
                     }
