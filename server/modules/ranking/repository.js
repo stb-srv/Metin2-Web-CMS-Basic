@@ -38,17 +38,18 @@ class RankingRepository {
 
     async getTotalPlayerCount(search = '') {
         const { s } = db;
-        let query = `SELECT COUNT(*) as count FROM ${s('player')}.player WHERE name NOT LIKE '[%]%'`;
-        const params = [];
-        
-        if (search) {
-            query += ` AND name LIKE ?`;
-            params.push(`%${search}%`);
-        }
-
+        let query = `
+            SELECT COUNT(*) as count FROM (
+                SELECT p.id FROM ${s('player')}.player p
+                WHERE p.name NOT LIKE '[%]%'
+                ${search ? 'AND p.name LIKE ?' : ''}
+                ORDER BY p.level DESC, p.exp DESC
+                LIMIT 200
+            ) as sub
+        `;
+        const params = search ? [`%${search}%`] : [];
         const [rows] = await db.query(query, params);
-        // Cap total count at 200 for ranking purposes
-        return Math.min(rows[0].count, 200);
+        return rows[0].count;
     }
 
     async getGuildRanking({ page = 1, limit = 10, search = '' }) {
@@ -85,16 +86,18 @@ class RankingRepository {
 
     async getTotalGuildCount(search = '') {
         const { s } = db;
-        let query = `SELECT COUNT(*) as count FROM ${s('player')}.guild WHERE 1=1`;
-        const params = [];
-        
-        if (search) {
-            query += ` AND name LIKE ?`;
-            params.push(`%${search}%`);
-        }
-
+        let query = `
+            SELECT COUNT(*) as count FROM (
+                SELECT id FROM ${s('player')}.guild
+                WHERE 1=1
+                ${search ? 'AND name LIKE ?' : ''}
+                ORDER BY ladder_point DESC, level DESC
+                LIMIT 200
+            ) as sub
+        `;
+        const params = search ? [`%${search}%`] : [];
         const [rows] = await db.query(query, params);
-        return Math.min(rows[0].count, 200);
+        return rows[0].count;
     }
 }
 
