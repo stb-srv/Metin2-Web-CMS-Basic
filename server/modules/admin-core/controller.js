@@ -1,5 +1,7 @@
 const repo = require('./repository');
 const isSuperAdmin = require('../../middleware/isSuperAdmin');
+const db = require('../../config/database');
+const { refreshThemeCache } = require('../../middleware/theme');
 
 class AdminController {
     async getPermissions(req, res) {
@@ -84,6 +86,37 @@ class AdminController {
             res.json({ success: true, maintenance_mode: newState, message: newState ? 'Wartungsmodus aktiviert' : 'Wartungsmodus deaktiviert' });
         } catch (err) {
             res.status(500).json({ success: false, message: err.message });
+        }
+    }
+
+    async setActiveTheme(req, res) {
+        try {
+            if (!req.adminPermissions?.can_manage_settings) {
+                return res.status(403).json({ success: false, message: 'Keine Berechtigung.' });
+            }
+
+            const { theme } = req.body;
+            const allowedThemes = ['classic', 'dragon-dark'];
+
+            if (!allowedThemes.includes(theme)) {
+                return res.status(400).json({ success: false, message: 'Unbekanntes Theme.' });
+            }
+
+            const { s } = db;
+            await db.query(
+                `INSERT INTO ${s('website')}.site_settings (setting_key, setting_value)
+                 VALUES ('active_theme', ?)
+                 ON DUPLICATE KEY UPDATE setting_value = ?`,
+                [theme, theme]
+            );
+
+            // Cache sofort leeren damit das neue Theme aktiv wird
+            await refreshThemeCache();
+
+            res.json({ success: true, message: `Theme "${theme}" aktiviert.` });
+        } catch (err) {
+            console.error('[Admin] Error setting theme:', err);
+            res.status(500).json({ success: false, message: 'Interner Serverfehler.' });
         }
     }
 }

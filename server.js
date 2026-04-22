@@ -10,6 +10,7 @@ const fs = require('fs');
 const setup = require('./server/config/setup');
 const { initDb } = setup;
 const logger = require('./server/utils/logger');
+const { serveThemedFile } = require('./server/middleware/theme');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -164,6 +165,18 @@ const maintenanceGuard = async (req, res, next) => {
 };
 
 app.use(maintenanceGuard);
+
+// HTML-Seiten themed ausliefern
+app.get('/', serveThemedFile('index.html'));
+app.get('/index.html', serveThemedFile('index.html'));
+app.get('/shop.html', serveThemedFile('shop.html'));
+app.get('/ranking.html', serveThemedFile('ranking.html'));
+app.get('/account.html', serveThemedFile('account.html'));
+app.get('/stash.html', serveThemedFile('stash.html'));
+app.get('/vote.html', serveThemedFile('vote.html'));
+app.get('/news.html', serveThemedFile('news.html'));
+app.get('/downloads.html', serveThemedFile('downloads.html'));
+app.get('/buy-coins.html', serveThemedFile('buy-coins.html'));
 
 // Serve static files (Frontend)
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));

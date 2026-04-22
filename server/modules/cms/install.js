@@ -27,7 +27,8 @@ module.exports = async function(db, ensureTable) {
         ['module_events', 'true'],
         ['module_discord', 'true'],
         ['module_maintenance', 'true'],
-        ['module_stash', 'true']
+        ['module_stash', 'true'],
+        ['active_theme', 'classic']
     ];
     for (const [key, val] of defaultSettings) {
         try {

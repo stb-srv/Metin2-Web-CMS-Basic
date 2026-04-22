@@ -63,5 +63,6 @@ router.post('/icons/convert', isAdmin, tgaUpload.array('tga_files', 500), iconCo
 router.get('/activity', isAdmin, asyncHandler(controller.getActivity));
 router.get('/stats', isAdmin, asyncHandler(controller.getDashboardStats));
 router.post('/toggle-maintenance', isSuperAdmin, asyncHandler(controller.toggleMaintenance));
+router.post('/settings/theme', isAdmin, asyncHandler(controller.setActiveTheme));
 
 module.exports = router;

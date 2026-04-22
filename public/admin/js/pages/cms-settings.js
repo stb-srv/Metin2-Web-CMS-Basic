@@ -7,6 +7,7 @@ const CmsSettingsPage = {
         return `
             <div class="admin-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
                 <button class="btn-tab active" onclick="CmsSettingsPage.switchTab('general', this)"><i class="fas fa-cog"></i> Allgemein</button>
+                <button class="btn-tab" onclick="CmsSettingsPage.switchTab('design', this)"><i class="fas fa-palette"></i> Design</button>
                 <button class="btn-tab" onclick="CmsSettingsPage.switchTab('modules', this)"><i class="fas fa-cubes"></i> Module</button>
                 <button class="btn-tab" onclick="CmsSettingsPage.switchTab('integration', this)"><i class="fas fa-link"></i> Integration</button>
             </div>
@@ -77,6 +78,35 @@ const CmsSettingsPage = {
                                     <option value="tr">Türkçe</option>
                                 </select>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Design -->
+                <div id="tab-design" class="tab-content" style="display:none;">
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <div class="admin-card-title"><i class="fas fa-palette"></i> Theme-Engine</div>
+                        </div>
+                        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">
+                            Wähle ein Basis-Theme für dein CMS aus. Themes können die komplette Struktur der Seite verändern.
+                        </p>
+                        
+                        <div class="theme-selector">
+                            <div class="theme-option" data-theme="classic" onclick="CmsSettingsPage.selectTheme('classic')">
+                                <div class="theme-preview classic-preview"></div>
+                                <span>Classic</span>
+                            </div>
+                            <div class="theme-option" data-theme="dragon-dark" onclick="CmsSettingsPage.selectTheme('dragon-dark')">
+                                <div class="theme-preview dragon-preview"></div>
+                                <span>Dragon Dark</span>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" id="activeThemeInput" name="active_theme" value="classic">
+                        
+                        <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.05);">
+                            <button type="button" class="btn-admin btn-primary" onclick="CmsSettingsPage.saveActiveTheme()"><i class="fas fa-save"></i> Theme aktivieren</button>
                         </div>
                     </div>
                 </div>
@@ -261,8 +291,46 @@ const CmsSettingsPage = {
                     logo.src = s.site_logo;
                     logo.style.display = 'block';
                 }
+
+                if (s.active_theme) {
+                    this.selectTheme(s.active_theme);
+                }
             }
         } catch (e) { console.error(e); }
+    },
+
+    selectTheme(theme) {
+        document.querySelectorAll('.theme-option').forEach(opt => {
+            opt.classList.remove('active');
+            if (opt.dataset.theme === theme) opt.classList.add('active');
+        });
+        document.getElementById('activeThemeInput').value = theme;
+    },
+
+    async saveActiveTheme() {
+        const theme = document.getElementById('activeThemeInput').value;
+        const token = localStorage.getItem('m2token');
+        
+        try {
+            const res = await fetch('/api/admin/settings/theme', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ theme })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+                // Optional: Reload after some delay to show the new theme
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showToast(data.message, 'error');
+            }
+        } catch (e) {
+            showToast('Fehler beim Speichern des Themes', 'error');
+        }
     },
 
     async save(e) {
