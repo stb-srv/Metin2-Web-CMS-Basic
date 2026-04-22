@@ -51,9 +51,21 @@ class PlayerController {
     }
 
     async unban(req, res) {
-        if (!req.adminPermissions.can_manage_players) return res.status(403).json({ success: false, message: 'Keine Rechte.' });
-        await repository.unbanAccount(req.body.account_id, req.adminUsername);
-        res.json({ success: true, message: 'Account entbannt.' });
+        try {
+            if (!req.adminPermissions.can_manage_players) {
+                return res.status(403).json({ success: false, message: 'Keine Rechte.' });
+            }
+
+            if (!req.body.account_id || isNaN(parseInt(req.body.account_id))) {
+                return res.status(400).json({ success: false, message: 'Ungültige Account-ID.' });
+            }
+
+            await repository.unbanAccount(parseInt(req.body.account_id), req.adminUsername);
+            res.json({ success: true, message: 'Account entbannt.' });
+        } catch (err) {
+            console.error('[Player] Error in unban:', err);
+            res.status(500).json({ success: false, message: 'Interner Serverfehler.' });
+        }
     }
 }
 
