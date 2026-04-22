@@ -18,4 +18,12 @@ const authLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-module.exports = { apiLimiter, authLimiter };
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5, // max 5 registrations per IP per hour
+    message: { success: false, message: 'Zu viele Registrierungsversuche. Bitte warte eine Stunde.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+module.exports = { apiLimiter, authLimiter, registerLimiter };
