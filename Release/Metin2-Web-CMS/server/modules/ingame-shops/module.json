@@ -1,0 +1,7 @@
+{
+    "name": "ingame-shops",
+    "version": "1.0.0",
+    "description": "Ingame shop management.",
+    "prefix": "/api/server",
+    "active": true
+}

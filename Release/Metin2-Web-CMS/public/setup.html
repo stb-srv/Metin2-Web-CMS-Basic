@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metin2Next | Installer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --setup-primary-rgb: 204, 0, 0;
+            --setup-accent-rgb: 255, 77, 77;
+            --setup-primary: rgb(var(--setup-primary-rgb));
+            --setup-accent: rgb(var(--setup-accent-rgb));
+            --setup-bg: #0a0a0f;
+        }
+
+        body {
+            background: var(--setup-bg);
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .installer-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .installer-card {
+            background: rgba(15, 15, 25, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1e1e2e;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            z-index: 2;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .step-dot.active {
+            background: var(--setup-primary);
+            border-color: var(--setup-accent);
+            box-shadow: 0 0 15px rgba(204, 0, 0, 0.5);
+            color: white;
+        }
+
+        .step-dot.completed {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+
+        .installer-content {
+            min-height: 300px;
+        }
+
+        .step-pane {
+            display: none;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .step-pane.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        h1 { font-size: 1.8rem; margin-bottom: 10px; color: var(--setup-accent); }
+        p { color: #94a3b8; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.6; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: #cbd5e1; }
+        .form-control {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-control:focus { border-color: var(--setup-primary); }
+
+        .installer-footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-setup {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-next { background: var(--setup-primary); color: white; }
+        .btn-next:hover { background: #7c3aed; transform: translateY(-2px); }
+        .btn-back { background: rgba(255, 255, 255, 0.05); color: #94a3b8; }
+        
+        .status-list { list-style: none; padding: 0; }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .status-icon { width: 20px; text-align: center; }
+        .status-ok { color: #10b981; }
+        .status-error { color: #ef4444; }
+
+        #particles-js {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="installer-container">
+        <div class="installer-card">
+            <div class="step-indicator">
+                <div class="step-dot active" data-step="1">1</div>
+                <div class="step-dot" data-step="2">2</div>
+                <div class="step-dot" data-step="3">3</div>
+                <div class="step-dot" data-step="4">4</div>
+                <div class="step-dot" data-step="5">5</div>
+                <div class="step-dot" data-step="6">6</div>
+            </div>
+
+            <div class="installer-content">
+                <!-- Step 1: Language Selection -->
+                <div class="step-pane active" id="step1">
+                    <h1 data-i18n="step0.title">Sprache wählen / Select Language</h1>
+                    <p data-i18n="step0.desc">Bitte wählen Sie Ihre bevorzugte Sprache für die Installation.</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px;">
+                        <button class="btn-setup btn-back lang-btn" onclick="setLanguage('de')" style="justify-content: center; background: rgba(255,255,255,0.05);">Deutsch</button>
+                        <button class="btn-setup btn-back lang-btn" onclick="setLanguage('en')" style="justify-content: center; background: rgba(255,255,255,0.05);">English</button>
+                        <button class="btn-setup btn-back lang-btn" onclick="setLanguage('it')" style="justify-content: center; background: rgba(255,255,255,0.05);">Italiano</button>
+                        <button class="btn-setup btn-back lang-btn" onclick="setLanguage('es')" style="justify-content: center; background: rgba(255,255,255,0.05);">Español</button>
+                        <button class="btn-setup btn-back lang-btn" onclick="setLanguage('pl')" style="justify-content: center; background: rgba(255,255,255,0.05);">Polski</button>
+                        <button class="btn-setup btn-back lang-btn" onclick="setLanguage('ro')" style="justify-content: center; background: rgba(255,255,255,0.05);">Română</button>
+                        <button class="btn-setup btn-back lang-btn" onclick="setLanguage('tr')" style="justify-content: center; background: rgba(255,255,255,0.05);">Türkçe</button>
+                        <button class="btn-setup btn-back lang-btn" onclick="setLanguage('pt')" style="justify-content: center; background: rgba(255,255,255,0.05);">Português</button>
+                    </div>
+                    <style>
+                        .lang-btn.active { border: 2px solid var(--setup-accent); background: rgba(var(--setup-accent-rgb), 0.1) !important; color: white; }
+                    </style>
+                </div>
+
+                <!-- Step 2: Welcome & Environment -->
+                <div class="step-pane" id="step2">
+                    <h1 data-i18n="step1.title">Willkommen bei Metin2Next</h1>
+                    <p data-i18n="step1.desc">Bevor wir starten, lassen Sie uns sicherstellen, dass Ihre Umgebung bereit ist.</p>
+                    <div id="envChecks" class="status-list">
+                        <div class="status-item"><i class="fas fa-spinner fa-spin status-icon"></i> <span data-i18n="status.checking_node">Prüfe Node.js...</span></div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Database -->
+                <div class="step-pane" id="step3">
+                    <h1 data-i18n="step2.title">Datenbank-Konfiguration</h1>
+                    <p data-i18n="step2.desc">Bitte geben Sie Ihre MySQL/MariaDB Zugangsdaten ein.</p>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="label.db_host">DB Host</label>
+                        <input type="text" class="form-control" id="db_host" value="127.0.0.1">
+                    </div>
+                    <div class="form-row" style="display:flex; gap:15px;">
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label" data-i18n="label.db_user">Benutzer</label>
+                            <input type="text" class="form-control" id="db_user" value="root">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label" data-i18n="label.db_pass">Passwort</label>
+                            <input type="password" class="form-control" id="db_password">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-setup" id="btnTestDb" style="background: rgba(var(--setup-accent-rgb), 0.1); border: 1px solid var(--setup-accent); color: var(--setup-accent); width: 100%; margin-top: 10px;">
+                        <i class="fas fa-plug"></i> <span data-i18n="btn.test_conn">Verbindung testen</span>
+                    </button>
+                    <div id="dbTestResult" style="margin-top:15px; font-size: 0.85rem; text-align: center;"></div>
+                </div>
+
+                <!-- Step 4: Site Config -->
+                <div class="step-pane" id="step4">
+                    <h1 data-i18n="step3.title">Website-Details</h1>
+                    <p data-i18n="step3.desc">Ein paar grundlegende Informationen für dein CMS.</p>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="label.server_name">Server Name</label>
+                        <input type="text" class="form-control" id="site_name" value="Metin2Next Server">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="label.default_lang">Standard-Sprache</label>
+                        <select class="form-control" id="default_lang">
+                            <option value="de">Deutsch</option>
+                            <option value="en" selected>English</option>
+                            <option value="it">Italiano</option>
+                            <option value="es">Español</option>
+                            <option value="pl">Polski</option>
+                            <option value="ro">Română</option>
+                            <option value="tr">Türkçe</option>
+                            <option value="pt">Português</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Step 5: Installation -->
+                <div class="step-pane" id="step5">
+                    <h1 data-i18n="step4.title">Installation läuft...</h1>
+                    <p data-i18n="step4.desc">Wir richten die Datenbank-Tabellen und Standard-Einstellungen ein.</p>
+                    <div id="installProgress" class="status-list">
+                        <!-- Progress will be shown here -->
+                    </div>
+                </div>
+
+                <!-- Step 6: Admin Account -->
+                <div class="step-pane" id="step6">
+                    <h1 data-i18n="step5.title">Admin-Konto erstellen</h1>
+                    <p data-i18n="step5.desc">Das wird das Haupt-Konto zur Verwaltung deines Servers.</p>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="label.username">Benutzername</label>
+                        <input type="text" class="form-control" id="admin_user" value="admin">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="label.email">E-Mail</label>
+                        <input type="email" class="form-control" id="admin_email" placeholder="admin@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="label.password">Passwort</label>
+                        <input type="password" class="form-control" id="admin_password">
+                    </div>
+                    <div id="adminProgress" class="status-list" style="margin-top: 15px;"></div>
+                </div>
+
+                <!-- Final Step: Success -->
+                <div class="step-pane" id="stepFinal">
+                    <div style="text-align:center; padding: 20px 0;">
+                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #10b981; margin-bottom: 20px;"></i>
+                        <h1 data-i18n="final.title">Installation Abgeschlossen!</h1>
+                        <p data-i18n="final.desc">Metin2Next CMS wurde erfolgreich installiert. Sie können sich jetzt einloggen und Ihren Server verwalten.</p>
+                        <button class="btn-setup btn-next" style="margin: 0 auto;" onclick="window.location='/'" data-i18n="btn.to_site">Zur Website</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="installer-footer" id="installerFooter">
+                <button class="btn-setup btn-back" id="btnBack" style="visibility: hidden;" data-i18n="btn.back">Zurück</button>
+                <button class="btn-setup btn-next" id="btnNext"><span data-i18n="btn.next">Weiter</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 50 },
+                color: { value: "#cc0000" },
+                opacity: { value: 0.3 },
+                size: { value: 3 },
+                line_linked: { enable: true, distance: 150, color: "#cc0000", opacity: 0.2, width: 1 },
+                move: { enable: true, speed: 2 }
+            }
+        });
+
+        const translations = {
+            en: {
+                "step0.title": "Select Language",
+                "step0.desc": "Please select your preferred language for the installation.",
+                "step1.title": "Welcome to Metin2Next",
+                "step1.desc": "Before we begin, let's make sure your environment is ready.",
+                "step2.title": "Database Configuration",
+                "step2.desc": "Please enter your MySQL/MariaDB credentials.",
+                "step3.title": "Website Details",
+                "step3.desc": "A few basic details for your CMS.",
+                "step4.title": "Installation in Progress...",
+                "step4.desc": "We are setting up the database tables and default settings.",
+                "step5.title": "Create Admin Account",
+                "step5.desc": "This will be the main account for managing your server.",
+                "final.title": "Installation Complete!",
+                "final.desc": "Metin2Next CMS has been successfully installed. You can now log in and manage your server.",
+                "label.db_host": "DB Host",
+                "label.db_user": "User",
+                "label.db_pass": "Password",
+                "label.server_name": "Server Name",
+                "label.default_lang": "Default Language",
+                "label.username": "Username",
+                "label.email": "Email",
+                "label.password": "Password",
+                "btn.test_conn": "Test Connection",
+                "btn.next": "Next",
+                "btn.back": "Back",
+                "btn.to_site": "To Website",
+                "status.checking_node": "Checking Node.js...",
+                "status.node_ok": "Node.js Version:",
+                "status.os_ok": "OS:",
+                "status.mysql_driver": "MySQL Driver:",
+                "status.ready": "Ready",
+                "status.missing": "Missing",
+                "status.saving_config": "Saving configuration...",
+                "status.config_saved": "Configuration saved.",
+                "status.creating_tables": "Creating database tables...",
+                "status.db_ready": "Database ready!",
+                "msg.conn_ok": "Connection successful!",
+                "msg.conn_fail": "Connection failed.",
+                "msg.pass_weak": "Please choose a stronger password.",
+                "msg.admin_ok": "Admin account created successfully!",
+                "msg.error": "Error",
+                "msg.error_loading_env": "Error loading environment",
+                "status.creating_admin": "Creating admin account...",
+                "status.admin_created": "Admin account created."
+            },
+            de: {
+                "step0.title": "Sprache wählen",
+                "step0.desc": "Bitte wählen Sie Ihre bevorzugte Sprache für die Installation.",
+                "step1.title": "Willkommen bei Metin2Next",
+                "step1.desc": "Bevor wir starten, lassen Sie uns sicherstellen, dass Ihre Umgebung bereit ist.",
+                "step2.title": "Datenbank-Konfiguration",
+                "step2.desc": "Bitte geben Sie Ihre MySQL/MariaDB Zugangsdaten ein.",
+                "step3.title": "Website-Details",
+                "step3.desc": "Ein paar grundlegende Informationen für dein CMS.",
+                "step4.title": "Installation läuft...",
+                "step4.desc": "Wir richten die Datenbank-Tabellen und Standard-Einstellungen ein.",
+                "step5.title": "Admin-Konto erstellen",
+                "step5.desc": "Das wird das Haupt-Konto zur Verwaltung deines Servers.",
+                "final.title": "Installation Abgeschlossen!",
+                "final.desc": "Metin2Next CMS wurde erfolgreich installiert. Sie können sich jetzt einloggen und Ihren Server verwalten.",
+                "label.db_host": "DB Host",
+                "label.db_user": "Benutzer",
+                "label.db_pass": "Passwort",
+                "label.server_name": "Server Name",
+                "label.default_lang": "Standard-Sprache",
+                "label.username": "Benutzername",
+                "label.email": "E-Mail",
+                "label.password": "Passwort",
+                "btn.test_conn": "Verbindung testen",
+                "btn.next": "Weiter",
+                "btn.back": "Zurück",
+                "btn.to_site": "Zur Website",
+                "status.checking_node": "Prüfe Node.js...",
+                "status.node_ok": "Node.js Version:",
+                "status.os_ok": "Betriebssystem:",
+                "status.mysql_driver": "MySQL Treiber:",
+                "status.ready": "Bereit",
+                "status.missing": "Fehlt",
+                "status.saving_config": "Speichere Konfiguration...",
+                "status.config_saved": "Konfiguration gespeichert.",
+                "status.creating_tables": "Erstelle Datenbank-Tabellen...",
+                "status.db_ready": "Datenbank bereit!",
+                "msg.conn_ok": "Verbindung erfolgreich!",
+                "msg.conn_fail": "Verbindung fehlgeschlagen.",
+                "msg.pass_weak": "Bitte ein sichereres Passwort wählen.",
+                "msg.admin_ok": "Admin-Konto erfolgreich erstellt!",
+                "msg.error": "Fehler",
+                "msg.error_loading_env": "Fehler beim Laden der Umgebungswerte",
+                "status.creating_admin": "Admin-Konto wird erstellt...",
+                "status.admin_created": "Admin-Konto erstellt."
+            },
+            it: {
+                "step0.title": "Seleziona Lingua",
+                "step0.desc": "Seleziona la tua lingua preferita per l'installazione.",
+                "step1.title": "Benvenuto in Metin2Next",
+                "step1.desc": "Prima di iniziare, assicuriamoci che il tuo ambiente sia pronto.",
+                "step2.title": "Configurazione Database",
+                "step2.desc": "Inserisci le tue credenziali MySQL/MariaDB.",
+                "step3.title": "Dettagli Sito",
+                "step3.desc": "Alcuni dettagli di base per il tuo CMS.",
+                "step4.title": "Installazione in corso...",
+                "step4.desc": "Stiamo configurando le tabelle del database e le impostazioni predefinite.",
+                "step5.title": "Crea Account Amministratore",
+                "step5.desc": "Questo sarà l'account principale per la gestione del tuo server.",
+                "final.title": "Installazione Completata!",
+                "final.desc": "Metin2Next CMS è stato installato con successo. Ora puoi accedere e gestire il tuo server.",
+                "label.db_host": "Host DB",
+                "label.db_user": "Utente",
+                "label.db_pass": "Password",
+                "label.server_name": "Nome Server",
+                "label.default_lang": "Lingua Predefinita",
+                "label.username": "Nome utente",
+                "label.email": "Email",
+                "label.password": "Password",
+                "btn.test_conn": "Testa Connessione",
+                "btn.next": "Avanti",
+                "btn.back": "Indietro",
+                "btn.to_site": "Al Sito",
+                "status.checking_node": "Controllo Node.js...",
+                "status.node_ok": "Versione Node.js:",
+                "status.os_ok": "OS:",
+                "status.mysql_driver": "Driver MySQL:",
+                "status.ready": "Pronto",
+                "status.missing": "Mancante",
+                "status.saving_config": "Salvataggio configurazione...",
+                "status.config_saved": "Configurazione salvata.",
+                "status.creating_tables": "Creazione tabelle database...",
+                "status.db_ready": "Database pronto!",
+                "msg.conn_ok": "Connessione riuscita!",
+                "msg.conn_fail": "Connessione fallita.",
+                "msg.pass_weak": "Scegli una password più sicura.",
+                "msg.admin_ok": "Account amministratore creato con successo!",
+                "msg.error": "Errore",
+                "msg.error_loading_env": "Errore nel caricamento dell'ambiente",
+                "status.creating_admin": "Creazione account amministratore...",
+                "status.admin_created": "Account amministratore creato."
+            },
+            es: {
+                "step0.title": "Seleccionar Idioma",
+                "step0.desc": "Seleccione su idioma preferido para la instalación.",
+                "step1.title": "Bienvenido a Metin2Next",
+                "step1.desc": "Antes de comenzar, asegúrese de que su entorno esté listo.",
+                "step2.title": "Configuración de la Base de Datos",
+                "step2.desc": "Ingrese sus credenciales de MySQL/MariaDB.",
+                "step3.title": "Detalles del Sitio",
+                "step3.desc": "Algunos detalles básicos para su CMS.",
+                "step4.title": "Instalación en Progreso...",
+                "step4.desc": "Estamos configurando las tablas de la base de datos y los ajustes predeterminados.",
+                "step5.title": "Crear Cuenta de Administrador",
+                "step5.desc": "Esta será la cuenta principal para administrar su servidor.",
+                "final.title": "¡Instalación Completada!",
+                "final.desc": "Metin2Next CMS se ha instalado correctamente. Ahora puede iniciar sesión y administrar su servidor.",
+                "label.db_host": "Host DB",
+                "label.db_user": "Usuario",
+                "label.db_pass": "Contraseña",
+                "label.server_name": "Nombre del Servidor",
+                "label.default_lang": "Idioma Predeterminado",
+                "label.username": "Nombre de usuario",
+                "label.email": "Correo electrónico",
+                "label.password": "Contraseña",
+                "btn.test_conn": "Probar Conexión",
+                "btn.next": "Siguiente",
+                "btn.back": "Atrás",
+                "btn.to_site": "Al Sitio",
+                "status.checking_node": "Comprobando Node.js...",
+                "status.node_ok": "Versión de Node.js:",
+                "status.os_ok": "SO:",
+                "status.mysql_driver": "Controlador MySQL:",
+                "status.ready": "Listo",
+                "status.missing": "Faltante",
+                "status.saving_config": "Guardando configuración...",
+                "status.config_saved": "Configuración guardada.",
+                "status.creating_tables": "Creando tablas de la base de datos...",
+                "status.db_ready": "¡Base de datos lista!",
+                "msg.conn_ok": "¡Conexión exitosa!",
+                "msg.conn_fail": "Conexión fallida.",
+                "msg.pass_weak": "Elija una contraseña más segura.",
+                "msg.admin_ok": "¡Cuenta de administrador creada con éxito!",
+                "msg.error": "Error",
+                "msg.error_loading_env": "Error al cargar el entorno",
+                "status.creating_admin": "Creando cuenta de administrador...",
+                "status.admin_created": "Cuenta de administrador creada."
+            },
+            pl: {
+                "step0.title": "Wybierz Język",
+                "step0.desc": "Wybierz preferowany język instalacji.",
+                "step1.title": "Witaj w Metin2Next",
+                "step1.desc": "Zanim zaczniemy, upewnijmy się, że Twoje środowisko jest gotowe.",
+                "step2.title": "Konfiguracja Bazy Danych",
+                "step2.desc": "Wprowadź swoje dane logowania MySQL/MariaDB.",
+                "step3.title": "Szczegóły Strony",
+                "step3.desc": "Kilka podstawowych informacji dla Twojego CMS.",
+                "step4.title": "Instalacja w Toku...",
+                "step4.desc": "Konfigurujemy tabele bazy danych i ustawienia domyślne.",
+                "step5.title": "Utwórz Konto Administratora",
+                "step5.desc": "To będzie główne konto do zarządzania Twoim serwerem.",
+                "final.title": "Instalacja Zakończona!",
+                "final.desc": "Metin2Next CMS został pomyślnie zainstalowany. Możesz się teraz zalogować i zarządzać swoim serwerem.",
+                "label.db_host": "Host DB",
+                "label.db_user": "Użytkownik",
+                "label.db_pass": "Hasło",
+                "label.server_name": "Nazwa Serwera",
+                "label.default_lang": "Język Domyślny",
+                "label.username": "Nazwa użytkownika",
+                "label.email": "Email",
+                "label.password": "Hasło",
+                "btn.test_conn": "Testuj Połączenie",
+                "btn.next": "Dalej",
+                "btn.back": "Wstecz",
+                "btn.to_site": "Do Strony",
+                "status.checking_node": "Sprawdzanie Node.js...",
+                "status.node_ok": "Wersja Node.js:",
+                "status.os_ok": "OS:",
+                "status.mysql_driver": "Sterownik MySQL:",
+                "status.ready": "Gotowy",
+                "status.missing": "Brak",
+                "status.saving_config": "Zapisywanie konfiguracji...",
+                "status.config_saved": "Konfiguracja zapisana.",
+                "status.creating_tables": "Tworzenie tabel bazy danych...",
+                "status.db_ready": "Baza danych gotowa!",
+                "msg.conn_ok": "Połączenie udane!",
+                "msg.conn_fail": "Połączenie nieudane.",
+                "msg.pass_weak": "Proszę wybrać silniejsze hasło.",
+                "msg.admin_ok": "Konto administratora utworzone pomyślnie!",
+                "msg.error": "Błąd",
+                "msg.error_loading_env": "Błąd ładowania środowiska",
+                "status.creating_admin": "Tworzenie konta administratora...",
+                "status.admin_created": "Konto administratora utworzone."
+            },
+            ro: {
+                "step0.title": "Selectați Limba",
+                "step0.desc": "Vă rugăm să selectați limba preferată pentru instalare.",
+                "step1.title": "Bun venit la Metin2Next",
+                "step1.desc": "Înainte de a începe, să ne asigurăm că mediul tău este pregătit.",
+                "step2.title": "Configurare Bază de Date",
+                "step2.desc": "Te rugăm să introduci datele tale MySQL/MariaDB.",
+                "step3.title": "Detalii Site",
+                "step3.desc": "Câteva detalii de bază pentru CMS-ul tău.",
+                "step4.title": "Instalare în Curs...",
+                "step4.desc": "Configurăm tabelele bazei de date și setările implicite.",
+                "step5.title": "Creează Cont Admin",
+                "step5.desc": "Acesta va fi contul principal pentru gestionarea serverului tău.",
+                "final.title": "Instalare Finalizată!",
+                "final.desc": "Metin2Next CMS a fost instalat cu succes. Te poți autentifica acum pentru a-ți gestiona serverul.",
+                "label.db_host": "Host DB",
+                "label.db_user": "Utilizator",
+                "label.db_pass": "Parolă",
+                "label.server_name": "Nume Server",
+                "label.default_lang": "Limbă Implicită",
+                "label.username": "Nume utilizator",
+                "label.email": "Email",
+                "label.password": "Parolă",
+                "btn.test_conn": "Testează Conexiunea",
+                "btn.next": "Înainte",
+                "btn.back": "Înapoi",
+                "btn.to_site": "Către Site",
+                "status.checking_node": "Verificare Node.js...",
+                "status.node_ok": "Versiune Node.js:",
+                "status.os_ok": "OS:",
+                "status.mysql_driver": "Driver MySQL:",
+                "status.ready": "Gata",
+                "status.missing": "Lipseşte",
+                "status.saving_config": "Salvare configurare...",
+                "status.config_saved": "Configurare salvată.",
+                "status.creating_tables": "Creare tabele bază de date...",
+                "status.db_ready": "Bază de date gata!",
+                "msg.conn_ok": "Conexiune reuşită!",
+                "msg.conn_fail": "Conexiune eşuată.",
+                "msg.pass_weak": "Te rugăm să alegi o parolă mai puternică.",
+                "msg.admin_ok": "Cont de administrator creat cu succes!",
+                "msg.error": "Eroare",
+                "msg.error_loading_env": "Eroare la încărcarea mediului",
+                "status.creating_admin": "Se creează contul de administrator...",
+                "status.admin_created": "Cont de administrator creat."
+            },
+            tr: {
+                "step0.title": "Dil Seçin",
+                "step0.desc": "Lütfen kurulum için tercih ettiğiniz dili seçin.",
+                "step1.title": "Metin2Next'e Hoş Geldiniz",
+                "step1.desc": "Başlamadan önce ortamınızın hazır olduğundan emin olalım.",
+                "step2.title": "Veritabanı Yapılandırması",
+                "step2.desc": "Lütfen MySQL/MariaDB bilgilerinizi giriniz.",
+                "step3.title": "Site Detayları",
+                "step3.desc": "CMS'niz için birkaç temel detay.",
+                "step4.title": "Kurulum Devam Ediyor...",
+                "step4.desc": "Veritabanı tablolarını ve varsayılan ayarları oluşturuyoruz.",
+                "step5.title": "Yönetici Hesabı Oluştur",
+                "step5.desc": "Bu, sunucunuzu yönetmek için ana hesabınız olacaktır.",
+                "final.title": "Kurulum Tamamlandı!",
+                "final.desc": "Metin2Next CMS başarıyla kuruldu. Artık giriş yapabilir ve sunucunuzu yönetebilirsiniz.",
+                "label.db_host": "DB Host",
+                "label.db_user": "Kullanıcı",
+                "label.db_pass": "Şifre",
+                "label.server_name": "Sunucu Adı",
+                "label.default_lang": "Varsayılan Dil",
+                "label.username": "Kullanıcı adı",
+                "label.email": "E-posta",
+                "label.password": "Şifre",
+                "btn.test_conn": "Bağlantıyı Test Et",
+                "btn.next": "İleri",
+                "btn.back": "Geri",
+                "btn.to_site": "Siteye Git",
+                "status.checking_node": "Node.js kontrol ediliyor...",
+                "status.node_ok": "Node.js Sürümü:",
+                "status.os_ok": "İS:",
+                "status.mysql_driver": "MySQL Sürücüsü:",
+                "status.ready": "Hazır",
+                "status.missing": "Eksik",
+                "status.saving_config": "Yapılandırma kaydediliyor...",
+                "status.config_saved": "Yapılandırma kaydedildi.",
+                "status.creating_tables": "Veritabanı tabloları oluşturuluyor...",
+                "status.db_ready": "Veritabanı hazır!",
+                "msg.conn_ok": "Bağlantı başarılı!",
+                "msg.conn_fail": "Bağlantı başarısız.",
+                "msg.pass_weak": "Lütfen daha güçlü bir şifre seçin.",
+                "msg.admin_ok": "Yönetici hesabı başarıyla oluşturuldu!",
+                "msg.error": "Hata",
+                "msg.error_loading_env": "Ortam yüklenirken hata oluştu",
+                "status.creating_admin": "Yönetici hesabı oluşturuluyor...",
+                "status.admin_created": "Yönetici hesabı oluşturuldu."
+            },
+            pt: {
+                "step0.title": "Selecionar Idioma",
+                "step0.desc": "Por favor, selecione o seu idioma preferido para a instalação.",
+                "step1.title": "Bem-vindo ao Metin2Next",
+                "step1.desc": "Antes de começarmos, vamos garantir que o seu ambiente está pronto.",
+                "step2.title": "Configuração da Base de Dados",
+                "step2.desc": "Por favor, insira as suas credenciais MySQL/MariaDB.",
+                "step3.title": "Detalhes do Site",
+                "step3.desc": "Alguns detalhes básicos para o seu CMS.",
+                "step4.title": "Instalação em Curso...",
+                "step4.desc": "Estamos a configurar as tabelas da base de dados e as definições padrão.",
+                "step5.title": "Criar Conta de Administrador",
+                "step5.desc": "Esta será a conta principal para gerir o seu servidor.",
+                "final.title": "Instalação Concluída!",
+                "final.desc": "O Metin2Next CMS foi instalado com sucesso. Já pode iniciar sessão e gerir o seu servidor.",
+                "label.db_host": "Host DB",
+                "label.db_user": "Utilizador",
+                "label.db_pass": "Palavra-passe",
+                "label.server_name": "Nome do Servidor",
+                "label.default_lang": "Idioma Padrão",
+                "label.username": "Nome de utilizador",
+                "label.email": "E-mail",
+                "label.password": "Palavra-passe",
+                "btn.test_conn": "Testar Ligação",
+                "btn.next": "Seguinte",
+                "btn.back": "Anterior",
+                "btn.to_site": "Para o Site",
+                "status.checking_node": "A verificar Node.js...",
+                "status.node_ok": "Versione Node.js:",
+                "status.os_ok": "SO:",
+                "status.mysql_driver": "Driver MySQL:",
+                "status.ready": "Pronto",
+                "status.missing": "Em falta",
+                "status.saving_config": "A guardar configuração...",
+                "status.config_saved": "Configuração guardada.",
+                "status.creating_tables": "A criar tabelas da base de dados...",
+                "status.db_ready": "Base de dados pronta!",
+                "msg.conn_ok": "Ligação bem-sucedida!",
+                "msg.conn_fail": "Ligação falhou.",
+                "msg.pass_weak": "Por favor, escolha uma palavra-passe mais forte.",
+                "msg.admin_ok": "Conta de administrador criada com sucesso!",
+                "msg.error": "Erro",
+                "msg.error_loading_env": "Erro ao carregar o ambiente",
+                "status.creating_admin": "A criar conta de administrador...",
+                "status.admin_created": "Conta de administrador criada."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+            const defaultLangSelect = document.getElementById('default_lang');
+            if (defaultLangSelect) defaultLangSelect.value = lang;
+
+            // Update UI buttons in Step 1
+            const langMap = { 'de':'Deutsch', 'en':'English', 'it':'Italiano', 'es':'Español', 'pl':'Polski', 'ro':'Română', 'tr':'Türkçe', 'pt':'Português' };
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText === langMap[lang]) btn.classList.add('active');
+            });
+
+            if (currentStep !== 1) runEnvChecks();
+        }
+
+        function getI18n(key) {
+            return (translations[currentLang] && translations[currentLang][key]) || key;
+        }
+
+        let currentStep = 1;
+        const totalSteps = 6;
+
+        const btnNext = document.getElementById('btnNext');
+        const btnBack = document.getElementById('btnBack');
+        const btnTestDb = document.getElementById('btnTestDb');
+
+        btnTestDb.addEventListener('click', async () => {
+            const dbData = {
+                db_host: document.getElementById('db_host').value,
+                db_user: document.getElementById('db_user').value,
+                db_password: document.getElementById('db_password').value
+            };
+            
+            const resultDiv = document.getElementById('dbTestResult');
+            btnTestDb.disabled = true;
+            btnTestDb.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
+            resultDiv.innerHTML = '';
+
+            try {
+                const res = await fetch('/api/setup/test-db', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(dbData)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    resultDiv.innerHTML = `<span style="color: #10b981;"><i class="fas fa-check"></i> ${getI18n('msg.conn_ok')}</span>`;
+                } else {
+                    resultDiv.innerHTML = `<span style="color: #ef4444;"><i class="fas fa-times"></i> ${data.message}</span>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<span style="color: #ef4444;"><i class="fas fa-times"></i> ${getI18n('msg.error')}: ${e.message}</span>`;
+            } finally {
+                btnTestDb.disabled = false;
+                btnTestDb.innerHTML = `<i class="fas fa-plug"></i> ${getI18n('btn.test_conn')}`;
+            }
+        });
+
+        btnNext.addEventListener('click', async () => {
+            if (await validateStep(currentStep)) {
+                if (currentStep < totalSteps) {
+                    goToStep(currentStep + 1);
+                }
+            }
+        });
+
+        btnBack.addEventListener('click', () => {
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        });
+
+        function goToStep(step) {
+            document.querySelectorAll('.step-pane').forEach(p => p.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            document.querySelectorAll('.step-dot').forEach((dot, idx) => {
+                const s = idx + 1;
+                dot.classList.remove('active', 'completed');
+                if (s < step) dot.classList.add('completed');
+                if (s === step) dot.classList.add('active');
+            });
+
+            currentStep = step;
+            
+            // Ensure buttons are visible/displayed
+            btnBack.style.display = 'flex';
+            btnNext.style.display = 'flex';
+            btnBack.style.visibility = step === 1 ? 'hidden' : 'visible';
+            
+            if (step === 2) runEnvChecks();
+        }
+
+        async function validateStep(step) {
+            if (step === 1) return true;
+            if (step === 2) return true;
+
+            if (step === 3) {
+                const dbData = {
+                    db_host: document.getElementById('db_host').value,
+                    db_user: document.getElementById('db_user').value,
+                    db_password: document.getElementById('db_password').value
+                };
+                btnNext.disabled = true;
+                btnNext.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ...`;
+                
+                try {
+                    const res = await fetch('/api/setup/test-db', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(dbData)
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        return true;
+                    } else {
+                        alert(data.message);
+                        return false;
+                    }
+                } finally {
+                    btnNext.disabled = false;
+                    btnNext.innerHTML = `${getI18n('btn.next')} <i class="fas fa-arrow-right"></i>`;
+                }
+            }
+
+            if (step === 4) return true;
+
+            if (step === 5) {
+                btnNext.disabled = true;
+                btnNext.style.display = 'none';
+                btnBack.style.display = 'none';
+                
+                const progress = document.getElementById('installProgress');
+                progress.innerHTML = `<div class="status-item"><i class="fas fa-spinner fa-spin status-icon"></i> ${getI18n('status.saving_config')}</div>`;
+                
+                try {
+                    const configData = {
+                        db_host: document.getElementById('db_host').value,
+                        db_user: document.getElementById('db_user').value,
+                        db_password: document.getElementById('db_password').value,
+                        site_name: document.getElementById('site_name').value
+                    };
+                    await fetch('/api/setup/save-config', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(configData)
+                    });
+                    progress.innerHTML += `<div class="status-item"><i class="fas fa-check status-icon status-ok"></i> ${getI18n('status.config_saved')}</div>`;
+                    
+                    progress.innerHTML += `<div class="status-item"><i class="fas fa-spinner fa-spin status-icon"></i> ${getI18n('status.creating_tables')}</div>`;
+                    const resInstall = await fetch('/api/setup/install-db', {method: 'POST'});
+                    const dataInstall = await resInstall.json();
+                    
+                    if (dataInstall.success) {
+                        progress.innerHTML += `<div class="status-item"><i class="fas fa-check status-icon status-ok"></i> ${getI18n('status.db_ready')}</div>`;
+                        setTimeout(() => goToStep(6), 1000);
+                        return false; 
+                    } else {
+                        progress.innerHTML += `<div class="status-item"><i class="fas fa-times status-icon status-error"></i> ${dataInstall.message}</div>`;
+                        btnNext.style.display = 'flex';
+                        btnBack.style.display = 'flex';
+                        return false;
+                    }
+                } catch (e) {
+                    alert(`${getI18n('msg.error')}: ${e.message}`);
+                    btnNext.style.display = 'flex';
+                    btnBack.style.display = 'flex';
+                    return false;
+                } finally {
+                    btnNext.disabled = false;
+                }
+            }
+
+            if (step === 6) {
+                const adminData = {
+                    username: document.getElementById('admin_user').value,
+                    email: document.getElementById('admin_email').value,
+                    password: document.getElementById('admin_password').value
+                };
+                
+                if (!adminData.password || adminData.password.length < 4) {
+                    alert(getI18n('msg.pass_weak'));
+                    return false;
+                }
+
+                btnNext.disabled = true;
+                btnBack.disabled = true;
+                const progress = document.getElementById('adminProgress');
+                progress.innerHTML = `<div class="status-item"><i class="fas fa-spinner fa-spin status-icon"></i> ${getI18n('status.creating_admin')}</div>`;
+
+                try {
+                    const res = await fetch('/api/setup/create-admin', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(adminData)
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        progress.innerHTML += `<div class="status-item"><i class="fas fa-check status-icon status-ok"></i> ${getI18n('status.admin_created')}</div>`;
+                        setTimeout(() => {
+                            document.getElementById('step6').classList.remove('active');
+                            document.getElementById('stepFinal').classList.add('active');
+                            document.getElementById('installerFooter').style.display = 'none';
+                        }, 1000);
+                        return false;
+                    } else {
+                        progress.innerHTML += `<div class="status-item"><i class="fas fa-times status-icon status-error"></i> ${data.message}</div>`;
+                        return false;
+                    }
+                } catch (e) {
+                    progress.innerHTML += `<div class="status-item"><i class="fas fa-times status-icon status-error"></i> ${e.message}</div>`;
+                    return false;
+                } finally {
+                    btnNext.disabled = false;
+                    btnBack.disabled = false;
+                }
+            }
+
+            return true;
+        }
+
+        async function runEnvChecks() {
+            const list = document.getElementById('envChecks');
+            if (!list) return;
+            list.innerHTML = '';
+            try {
+                const res = await fetch('/api/setup/check-env');
+                const data = await res.json();
+                const checks = data.checks;
+
+                list.innerHTML += `<div class="status-item"><i class="fas fa-check status-icon status-ok"></i> ${getI18n('status.node_ok')} ${checks.node.version}</div>`;
+                list.innerHTML += `<div class="status-item"><i class="fas fa-check status-icon status-ok"></i> ${getI18n('status.os_ok')} ${checks.os.type}</div>`;
+                
+                const dbStatus = checks.packages.mysql2.installed ? 'status-ok' : 'status-error';
+                list.innerHTML += `<div class="status-item"><i class="fas ${checks.packages.mysql2.installed ? 'fa-check':'fa-times'} status-icon ${dbStatus}"></i> ${getI18n('status.mysql_driver')} ${checks.packages.mysql2.installed ? getI18n('status.ready') : getI18n('status.missing')}</div>`;
+            } catch (e) {
+                list.innerHTML = `<div class="status-item status-error">${getI18n('msg.error_loading_env')}</div>`;
+            }
+        }
+
+        // Initialize language based on browser or default to 'en'
+        const browserLang = navigator.language.split('-')[0];
+        currentLang = translations[browserLang] ? browserLang : 'en';
+        setLanguage(currentLang);
+        // runEnvChecks is called by setLanguage, so no need to call it again here.
+    </script>
+</body>
+</html>

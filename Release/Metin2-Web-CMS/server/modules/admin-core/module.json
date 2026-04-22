@@ -1,0 +1,7 @@
+{
+    "name": "admin-core",
+    "version": "1.0.0",
+    "description": "Core Admin functionality, permissions, and dashboard stats.",
+    "prefix": "/api/admin/core",
+    "active": true
+}

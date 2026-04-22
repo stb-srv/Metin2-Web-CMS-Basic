@@ -1,0 +1,8 @@
+{
+    "name": "admin-notifications",
+    "description": "SSE Notifications endpoint for admins",
+    "version": "1.0.0",
+    "author": "Metin2 Web CMS",
+    "prefix": "/api/admin/notifications",
+    "dependencies": []
+}

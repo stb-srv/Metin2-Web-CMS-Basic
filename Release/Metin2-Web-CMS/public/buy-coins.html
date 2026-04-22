@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coins kaufen | Metin2 Web</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/js/theme.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .package-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .package-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .package-card.popular {
+            border-color: var(--gold);
+            background: rgba(var(--gold-rgb), 0.05);
+        }
+
+        .package-card.popular::before {
+            content: 'BELIEBT';
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: var(--gold);
+            color: black;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+        }
+
+        .coin-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.3));
+        }
+
+        .dr-amount {
+            font-size: 2.5rem;
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .bonus-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-top: 1.5rem;
+        }
+
+        .promotion-banner {
+            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 20px rgba(var(--primary-rgb), 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="particles-js"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar"></nav>
+
+    <!-- Main Content -->
+    <main class="container" style="padding: 6rem 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            
+            <div style="text-align: center; margin-bottom: 4rem;">
+                <h1 style="font-size: 3rem; margin-bottom: 1rem;">Drachenmünzen <span class="text-primary">(DR)</span></h1>
+                <p style="color: var(--text-muted); font-size: 1.2rem; max-width: 700px; margin: 0 auto;">Erweitere dein Spielerlebnis mit Premium-Gegenständen aus dem Item-Shop. Wähle ein Paket und erhalte deine Coins sofort!</p>
+            </div>
+
+            <!-- Promotion Banner -->
+            <div id="promoBanner" style="display: none;" class="promotion-banner">
+                <h2 style="margin: 0; font-size: 1.8rem;"><i class="fas fa-fire"></i> AKTION: <span id="promoPercent">0</span>% MEHR DR!</h2>
+                <p id="promoExpiry" style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem;"></p>
+            </div>
+
+            <!-- Packages Container -->
+            <div id="packageContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+                <!-- Skeleton Loader -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 5rem;">
+                    <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--primary);"></i>
+                </div>
+            </div>
+
+            <div style="margin-top: 5rem; text-align: center; color: var(--text-muted);">
+                <p><i class="fas fa-shield-alt"></i> Alle Transaktionen sind sicher und verschlüsselt.</p>
+                <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 3rem; opacity: 0.7; font-size: 2.5rem; align-items: center;">
+                    <i class="fab fa-cc-paypal" title="PayPal" style="color: #003087;"></i>
+                    <div style="font-weight: 800; font-family: sans-serif; letter-spacing: -1px; color: #0099cc; font-size: 1.8rem; border: 2px solid #0099cc; padding: 2px 8px; border-radius: 4px;">paysafecard</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="dynamic-footer"></footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/core/modal.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/api.js"></script>
+    <script src="js/core/state.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/main.js"></script>
+    <script src="js/core/navbar.js"></script>
+    <script src="js/core/footer.js"></script>
+
+    <script>
+        async function loadShopData() {
+            const container = document.getElementById('packageContainer');
+            const promoBanner = document.getElementById('promoBanner');
+            const promoPercent = document.getElementById('promoPercent');
+            const promoExpiry = document.getElementById('promoExpiry');
+
+            try {
+                const res = await apiFetch('/shop-coins/public');
+                
+                if (res.success) {
+                    window.shopPackages = res.packages;
+                    window.shopPromoBonus = res.bonus.percentage || 0;
+                    window.shopSettings = res.settings || {};
+
+                    const bonusPercent = res.bonus.percentage || 0;
+                    
+                    if (bonusPercent > 0) {
+                        promoBanner.style.display = 'block';
+                        promoPercent.innerText = bonusPercent;
+                        if (res.bonus.expires_at) {
+                            const date = new Date(res.bonus.expires_at).toLocaleDateString();
+                            promoExpiry.innerText = `Gültig bis zum ${date}`;
+                        } else {
+                            promoExpiry.innerText = 'Nur für kurze Zeit!';
+                        }
+                    } else {
+                        promoBanner.style.display = 'none';
+                    }
+
+                    if (res.packages.length === 0) {
+                        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem;">Derzeit sind keine Pakete verfügbar.</div>';
+                        return;
+                    }
+
+                    container.innerHTML = res.packages.map((pkg, idx) => {
+                        const bonusAmount = Math.floor(pkg.dr_amount * (bonusPercent / 100));
+                        const totalAmount = pkg.dr_amount + bonusAmount;
+                        const isPopular = idx === Math.floor(res.packages.length / 2);
+
+                        return `
+                            <div class="package-card ${isPopular ? 'popular' : ''}">
+                                <div>
+                                    <div class="coin-icon">
+                                        <i class="fas fa-coins" style="color: var(--gold);"></i>
+                                    </div>
+                                    <div class="dr-amount">${totalAmount.toLocaleString()} DR</div>
+                                    ${bonusPercent > 0 ? `<div class="bonus-badge">+${bonusAmount.toLocaleString()} Gratis-DR</div>` : ''}
+                                    <div style="font-weight: 500; font-size: 1.1rem; color: var(--text-main);">${pkg.name}</div>
+                                </div>
+                                
+                                <div>
+                                    <div class="price-tag">${pkg.price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</div>
+                                    <button onclick="checkout(${pkg.id})" class="btn primary-btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">
+                                        <i class="fas fa-shopping-cart"></i> Jetzt kaufen
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                } else {
+                    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--danger);">Fehler: ${res.message}</div>`;
+                }
+            } catch (err) {
+                console.error('Load Error:', err);
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger);">Netzwerkfehler beim Laden der Pakete.</div>';
+            }
+        }
+
+        function checkout(packageId) {
+            if (!localStorage.getItem('m2user')) {
+                customAlert('Bitte logge dich zuerst ein, um Coins zu kaufen.', 'Login erforderlich');
+                return;
+            }
+            
+            openPaymentModal(packageId);
+        }
+
+        function openPaymentModal(packageId) {
+            const pkg = window.shopPackages ? window.shopPackages.find(p => p.id === packageId) : null;
+            if (!pkg) return;
+
+            const bonusAmount = Math.floor(pkg.dr_amount * (window.shopPromoBonus / 100));
+            const totalCoins = pkg.dr_amount + bonusAmount;
+            
+            // Robust retrieval of PayPal Email
+            let paypalEmail = '...';
+            if (window.shopSettings && window.shopSettings.paypal_email) {
+                paypalEmail = window.shopSettings.paypal_email;
+            } else if (window.shopSettings && window.shopSettings.paypalEmail) { // Fallback for camelCase
+                paypalEmail = window.shopSettings.paypalEmail;
+            }
+            
+            console.log('[Shop] Opening checkout with PayPal Email:', paypalEmail);
+
+            const container = window.getGlobalModalContainer();
+            const title = document.getElementById('globalModalTitle');
+            const message = document.getElementById('globalModalMessage');
+            const actions = document.getElementById('globalModalActions');
+
+            title.innerText = 'Zahlungsmethode wählen';
+            message.innerHTML = `
+                <div style="text-align: left;">
+                    <p style="margin-bottom: 1.5rem; text-align: center;">Du kaufst <b>${totalCoins.toLocaleString()} DR</b> für <b>${pkg.price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</b>.</p>
+                    
+                    <div id="methodSelector" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div onclick="selectMethod('paypal')" id="btnPaypal" style="cursor: pointer; padding: 1.5rem; border: 1px solid var(--glass-border); border-radius: 12px; text-align: center; transition: all 0.2s;">
+                            <i class="fab fa-paypal" style="font-size: 2rem; color: #003087; margin-bottom: 0.5rem; display: block;"></i>
+                            <strong>PayPal</strong>
+                        </div>
+                        <div onclick="selectMethod('paysafecard')" id="btnPsc" style="cursor: pointer; padding: 1.5rem; border: 1px solid var(--glass-border); border-radius: 12px; text-align: center; transition: all 0.2s;">
+                             <div style="font-weight: 800; color: #0099cc; font-size: 1.2rem; margin-bottom: 0.5rem; display: block;">paysafecard</div>
+                            <strong>Paysafecard</strong>
+                        </div>
+                    </div>
+
+                    <div id="paymentInstructions" style="display: none; margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);">
+                        <!-- Dynamic Instructions -->
+                    </div>
+                </div>
+            `;
+
+            actions.innerHTML = `
+                <button class="btn secondary-btn" onclick="document.getElementById('globalModalContainer').style.display='none'">Abbrechen</button>
+                <button class="btn primary-btn" id="btnSubmitPayment" style="display: none;" onclick="submitPayment(${packageId})">Anfrage senden</button>
+            `;
+
+            container.style.display = 'flex';
+
+            window.selectedPaymentMethod = null;
+            window.selectMethod = (method) => {
+                window.selectedPaymentMethod = method;
+                document.getElementById('btnPaypal').style.borderColor = method === 'paypal' ? 'var(--primary)' : 'var(--glass-border)';
+                document.getElementById('btnPaypal').style.background = method === 'paypal' ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent';
+                document.getElementById('btnPsc').style.borderColor = method === 'paysafecard' ? 'var(--primary)' : 'var(--glass-border)';
+                document.getElementById('btnPsc').style.background = method === 'paysafecard' ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent';
+                
+                const instr = document.getElementById('paymentInstructions');
+                const submitBtn = document.getElementById('btnSubmitPayment');
+                instr.style.display = 'block';
+                submitBtn.style.display = 'inline-block';
+
+                if (method === 'paypal') {
+                    instr.innerHTML = `
+                        <p style="font-size: 0.95rem; margin-bottom: 1rem;">Bitte sende <b>${pkg.price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</b> per <b>"Geld an Freunde"</b> an folgende E-Mail:</p>
+                        <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 8px; text-align: center; border: 1px dashed var(--glass-border); font-weight: 700; color: var(--gold);">${paypalEmail}</div>
+                        <p style="font-size: 0.85rem; margin-top: 1rem; color: var(--text-muted);"><i class="fas fa-info-circle"></i> Gib als Betreff deinen Accountnamen an. Deine Coins werden nach manueller Prüfung gutgeschrieben.</p>
+                        <input type="hidden" id="paymentDetails" value="PayPal Überweisung">
+                    `;
+                } else {
+                    instr.innerHTML = `
+                        <p style="font-size: 0.95rem; margin-bottom: 1rem;">Gib deinen 16-stelligen Paysafecard-Code hier ein:</p>
+                        <input type="text" id="paymentDetails" maxlength="19" placeholder="xxxx-xxxx-xxxx-xxxx" style="width: 100%; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white; padding: 1rem; border-radius: 8px; text-align: center; font-family: monospace; font-size: 1.1rem; outline: none;">
+                        <p style="font-size: 0.85rem; margin-top: 1rem; color: var(--text-muted);"><i class="fas fa-info-circle"></i> Der Code wird geprüft und die Coins anschließend gutgeschrieben.</p>
+                    `;
+
+                    // Simple dash-masking for PSC
+                    const input = document.getElementById('paymentDetails');
+                    input.addEventListener('input', (e) => {
+                        let value = e.target.value.replace(/[^0-9]/g, '');
+                        if (value.length > 16) value = value.slice(0, 16);
+                        let masked = value.match(/.{1,4}/g)?.join('-') || value;
+                        e.target.value = masked;
+                    });
+                }
+            };
+        }
+
+        async function submitPayment(packageId) {
+            const method = window.selectedPaymentMethod;
+            const details = document.getElementById('paymentDetails')?.value;
+
+            if (!method || !details) {
+                customAlert('Bitte fülle alle Felder aus.', 'Fehler');
+                return;
+            }
+
+            if (method === 'paysafecard' && details.replace(/-/g, '').length < 16) {
+                customAlert('Der Paysafecard-Code muss 16 Ziffern enthalten.', 'Fehler');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitPayment');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Senden...';
+
+            try {
+                const res = await apiFetch('/shop-payments/submit', {
+                    method: 'POST',
+                    body: JSON.stringify({ packageId, method, details })
+                });
+
+                if (res.success) {
+                    document.getElementById('globalModalContainer').style.display = 'none';
+                    customAlert(res.message, 'Anfrage gesendet');
+                } else {
+                    customAlert(res.message, 'Fehler');
+                    btn.disabled = false;
+                    btn.innerText = 'Anfrage senden';
+                }
+            } catch (err) {
+                console.error('Payment Submission Error:', err);
+                customAlert('Netzwerkfehler beim Senden der Anfrage.', 'Fehler');
+                btn.disabled = false;
+                btn.innerText = 'Anfrage senden';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadShopData);
+    </script>
+</body>
+
+</html>

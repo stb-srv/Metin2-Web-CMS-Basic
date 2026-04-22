@@ -1,0 +1,7 @@
+{
+    "name": "setup",
+    "version": "1.0.0",
+    "description": "Installer and setup wizard.",
+    "prefix": "/api/setup",
+    "active": true
+}

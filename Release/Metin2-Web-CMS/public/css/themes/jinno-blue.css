@@ -1,0 +1,16 @@
+/* theme-blue.css - Jinno Empire */
+:root.theme-blue,
+body.theme-blue {
+    --primary-rgb: 37, 99, 235;
+    --accent-rgb: 129, 140, 248;
+    --primary-hover: #3b82f6;
+    --glass-bg: rgba(15, 23, 42, 0.75);
+}
+
+:root.theme-blue.light-mode,
+body.theme-blue.light-mode {
+    --primary-rgb: 29, 78, 216;
+    --accent-rgb: 59, 130, 246;
+    --primary-hover: #2563eb;
+    --glass-bg: rgba(219, 234, 254, 0.85);
+}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metin2 Server | Item Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="/js/theme.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="particles" id="particles-js"></div>
+
+    <nav class="navbar"></nav>
+
+    <main class="shop-container">
+        <div class="shop-header">
+            <div>
+                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Der <span
+                        class="gradient-text">Schwarzmarkt</span></h1>
+                <p style="color: var(--text-muted);">Erwerbe epische Gegenstände, um deine Macht zu steigern.</p>
+            </div>
+            <div class="balance-display glass-panel" style="padding: 1rem 2rem; width: auto; display: flex; gap: 2rem;">
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Guthaben (DR)</span>
+                    <strong style="font-size: 1.2rem;"><i class="fas fa-coins text-gold"></i> <span
+                            id="shopCoins">0</span></strong>
+                </div>
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Marken</span>
+                    <strong style="font-size: 1.2rem;"><i class="fas fa-circle-notch text-silver"></i> <span
+                            id="shopCash">0</span></strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Categories -->
+        <div style="margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+            <div class="input-group" style="margin-bottom: 0;">
+                <i class="fas fa-search"></i>
+                <input type="text" id="shopSearchInput" placeholder="Item suchen..." style="padding-left: 2.5rem;"
+                    onkeyup="applyShopFilters()">
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="currencyFilters">
+                <button class="btn secondary-btn filter-btn active" data-cur="ALL"
+                    style="width: auto; padding: 0.5rem 1rem;">Alle Kategorien</button>
+                <button class="btn secondary-btn filter-btn" data-cur="DR" style="width: auto; padding: 0.5rem 1rem;"><i
+                        class="fas fa-coins text-gold"></i> Nur DR</button>
+                <button class="btn secondary-btn filter-btn" data-cur="DM" style="width: auto; padding: 0.5rem 1rem;"><i
+                        class="fas fa-coins text-silver"></i> Nur DM</button>
+                <!-- Dynamic categories injected here by JS -->
+            </div>
+        </div>
+
+        <div class="shop-grid" id="shopGrid">
+            <!-- Items will be injected here via JavaScript -->
+            <div style="text-align: center; grid-column: 1 / -1; padding: 3rem;">
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Lade Shop-Inhalte...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Purchase -->
+    <div id="buyModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center;">
+        <div class="glass-panel" style="width: 400px;">
+            <h2 id="modalItemName">Item Name</h2>
+            <div class="item-icon" style="width: 80px; height: 80px; margin: 0 auto 1.5rem auto;">
+                <i class="fas fa-box" style="font-size: 2rem; color: var(--accent);"></i>
+            </div>
+            <div id="modalItemDetails" style="display:none; margin-bottom: 1.5rem;"></div>
+            <p style="text-align: center; margin-bottom: 2rem; color: var(--text-muted);">Möchtest du diesen Gegenstand
+                wirklich kaufen?</p>
+
+            <div
+                style="display: flex; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 1.5rem; margin-bottom: 0.5rem;">
+                <span>Preis:</span>
+                <strong style="font-size: 1.2rem;" id="modalItemPriceText"><i class="fas fa-coins text-gold"></i> <span
+                        id="modalItemPrice">0</span></strong>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.5rem 1rem;">
+                <span style="font-size: 0.9rem; color: var(--text-muted);">Lieferort:</span>
+                <select id="buyDestination"
+                    style="background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); padding: 0.4rem; border-radius: 6px; outline: none;">
+                    <option value="MALL">Ingame Itemshop-Lager</option>
+                    <option value="WEB">Web-Lager (Website)</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn secondary-btn" onclick="closeBuyModal()">Abbrechen</button>
+                <button class="btn primary-btn" id="confirmBuyBtn">Kaufen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dynamic-footer"></footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/core/modal.js"></script>
+    <script src="js/core/i18n.js"></script>
+    <script src="js/core/api.js"></script>
+    <script src="js/core/state.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/shop.js"></script>
+    <script src="js/core/main.js"></script>
+
+    <script src="js/core/navbar.js"></script>
+    <script src="js/core/footer.js"></script>
+    <script>
+        // Shop initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            let user;
+            try {
+                user = JSON.parse(localStorage.getItem('m2user'));
+            } catch (e) {
+                console.error("Session storage corruption", e);
+            }
+
+            if (!user) {
+                customAlert('Du musst eingeloggt sein, um den Shop zu betreten!', 'Hinweis');
+                document.getElementById('globalModalOkBtn').onclick = () => window.location.href = '/';
+                return;
+            }
+
+            document.getElementById('shopCoins').innerText = user.coins || 0;
+            document.getElementById('shopCash').innerText = user.cash || 0;
+
+            loadShopItems();
+
+        });
+    </script>
+</body>
+
+</html>
