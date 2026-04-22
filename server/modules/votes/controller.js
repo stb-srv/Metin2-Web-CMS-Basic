@@ -71,7 +71,8 @@ class VoteController {
         try {
             const accountId = req.accountId; 
             // req.accountId is populated by user auth middleware
-            const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            const ipAddress = rawIp.split(',')[0].trim();
 
             const links = await repo.getPublicLinks(accountId, ipAddress);
             res.json({ success: true, links });
@@ -86,7 +87,8 @@ class VoteController {
         try {
             const accountId = req.accountId;
             const { linkId } = req.body;
-            const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            const ipAddress = rawIp.split(',')[0].trim();
 
             if (!linkId) {
                 return res.status(400).json({ success: false, message: 'Voting Link ID fehlt.' });
