@@ -20,6 +20,21 @@ class VoteController {
                 return res.status(400).json({ success: false, message: 'Bitte alle Pflichtfelder ausfüllen.' });
             }
 
+            try {
+                const parsed = new URL(url);
+                if (!['http:', 'https:'].includes(parsed.protocol)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Nur HTTP/HTTPS URLs sind erlaubt.'
+                    });
+                }
+            } catch {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Ungültige URL.'
+                });
+            }
+
             const id = await repo.createLink({ title, url, image_url, reward, cooldown_hours, is_active: is_active ? 1 : 0 });
             res.json({ success: true, message: 'Vote-Link erstellt.', id });
         } catch (err) {
@@ -36,6 +51,21 @@ class VoteController {
             
             if (!title || !url || reward == null || cooldown_hours == null) {
                 return res.status(400).json({ success: false, message: 'Bitte alle Pflichtfelder ausfüllen.' });
+            }
+
+            try {
+                const parsed = new URL(url);
+                if (!['http:', 'https:'].includes(parsed.protocol)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Nur HTTP/HTTPS URLs sind erlaubt.'
+                    });
+                }
+            } catch {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Ungültige URL.'
+                });
             }
 
             const success = await repo.updateLink(id, { title, url, image_url, reward, cooldown_hours, is_active: is_active ? 1 : 0 });
