@@ -46,4 +46,9 @@ function serveThemedFile(filename) {
     };
 }
 
+// Sofort beim Start den Cache laden
+refreshThemeCache().catch(e => 
+    console.error('[ThemeMiddleware] Initial cache load failed:', e)
+);
+
 module.exports = { themeMiddleware, serveThemedFile, refreshThemeCache };
