@@ -30,13 +30,19 @@ class ShopPaymentController {
             const bonusAmount = Math.floor(pkg.dr_amount * (bonus.percentage / 100));
             const totalCoins = pkg.dr_amount + bonusAmount;
 
+            if (typeof details !== 'string' || details.trim().length === 0) {
+                return res.status(400).json({ success: false, message: 'Bitte Zahlungsdetails angeben.' });
+            }
+
+            const sanitizedDetails = details.trim().substring(0, 500);
+
             const paymentId = await repo.createPayment({
                 account_id: accountId,
                 package_id: packageId,
                 method,
                 amount: pkg.price,
                 coins: totalCoins,
-                details
+                details: sanitizedDetails
             });
 
             // Notify admins in real-time
