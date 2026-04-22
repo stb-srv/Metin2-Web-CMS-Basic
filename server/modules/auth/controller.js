@@ -212,84 +212,108 @@ class AuthController {
     }
 
     async updatePassword(req, res) {
-        const { oldPassword, newPassword, confirmNewPassword } = req.body;
-        // Joi already handles basic validation, but let's keep it safe
-        if (!oldPassword || !newPassword || !confirmNewPassword) {
-            return res.status(400).json({ success: false, message: 'Alle Felder ausfüllen.' });
+        try {
+            const { oldPassword, newPassword, confirmNewPassword } = req.body;
+            // Joi already handles basic validation, but let's keep it safe
+            if (!oldPassword || !newPassword || !confirmNewPassword) {
+                return res.status(400).json({ success: false, message: 'Alle Felder ausfüllen.' });
+            }
+
+            const { s } = db;
+            const [users] = await db.query(`SELECT web_pass_hash, password FROM ${s('account')}.account WHERE id = ?`, [req.accountId]);
+            if (users.length === 0) return res.status(404).json({ success: false, message: 'Account nicht gefunden.' });
+
+            const { web_pass_hash, password: legacyPassword } = users[0];
+            let isMatch = false;
+
+            if (web_pass_hash) {
+                isMatch = await bcrypt.compare(oldPassword, web_pass_hash);
+            } else {
+                isMatch = (legacyPassword === hashPassword(oldPassword));
+            }
+
+            if (!isMatch) {
+                return res.status(401).json({ success: false, message: 'Altes Passwort ist inkorrekt.' });
+            }
+
+            const legacyHash = hashPassword(newPassword);
+            const webHash = await bcryptHash(newPassword);
+            await db.query(`UPDATE ${s('account')}.account SET password = ?, web_pass_hash = ? WHERE id = ?`, [legacyHash, webHash, req.accountId]);
+            res.json({ success: true, message: 'Passwort erfolgreich geändert!' });
+        } catch (err) {
+            console.error('[Auth] Error in updatePassword:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Interner Serverfehler.' 
+            });
         }
-
-        const { s } = db;
-        const [users] = await db.query(`SELECT web_pass_hash, password FROM ${s('account')}.account WHERE id = ?`, [req.accountId]);
-        if (users.length === 0) return res.status(404).json({ success: false, message: 'Account nicht gefunden.' });
-
-        const { web_pass_hash, password: legacyPassword } = users[0];
-        let isMatch = false;
-
-        if (web_pass_hash) {
-            isMatch = await bcrypt.compare(oldPassword, web_pass_hash);
-        } else {
-            isMatch = (legacyPassword === hashPassword(oldPassword));
-        }
-
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Altes Passwort ist inkorrekt.' });
-        }
-
-        const legacyHash = hashPassword(newPassword);
-        const webHash = await bcryptHash(newPassword);
-        await db.query(`UPDATE ${s('account')}.account SET password = ?, web_pass_hash = ? WHERE id = ?`, [legacyHash, webHash, req.accountId]);
-        res.json({ success: true, message: 'Passwort erfolgreich geändert!' });
     }
 
     async updateSecurityQuestion(req, res) {
-        const { password, question1, answer1 } = req.body;
+        try {
+            const { password, question1, answer1 } = req.body;
 
-        const { s } = db;
-        const [users] = await db.query(`SELECT web_pass_hash, password FROM ${s('account')}.account WHERE id = ?`, [req.accountId]);
-        if (users.length === 0) return res.status(404).json({ success: false, message: 'Account nicht gefunden.' });
+            const { s } = db;
+            const [users] = await db.query(`SELECT web_pass_hash, password FROM ${s('account')}.account WHERE id = ?`, [req.accountId]);
+            if (users.length === 0) return res.status(404).json({ success: false, message: 'Account nicht gefunden.' });
 
-        const { web_pass_hash, password: legacyPassword } = users[0];
-        let isMatch = false;
+            const { web_pass_hash, password: legacyPassword } = users[0];
+            let isMatch = false;
 
-        if (web_pass_hash) {
-            isMatch = await bcrypt.compare(password, web_pass_hash);
-        } else {
-            isMatch = (legacyPassword === hashPassword(password));
+            if (web_pass_hash) {
+                isMatch = await bcrypt.compare(password, web_pass_hash);
+            } else {
+                isMatch = (legacyPassword === hashPassword(password));
+            }
+
+            if (!isMatch) {
+                return res.status(401).json({ success: false, message: 'Passwort ist inkorrekt.' });
+            }
+
+            const hashedAnswer = await bcryptHash(answer1.toLowerCase().trim());
+            await db.query(`UPDATE ${s('account')}.account SET question1 = ?, answer1 = ? WHERE id = ?`, [question1, hashedAnswer, req.accountId]);
+            res.json({ success: true, message: 'Sicherheitsfrage erfolgreich aktualisiert!' });
+        } catch (err) {
+            console.error('[Auth] Error in updateSecurityQuestion:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Interner Serverfehler.' 
+            });
         }
-
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Passwort ist inkorrekt.' });
-        }
-
-        const hashedAnswer = await bcryptHash(answer1.toLowerCase().trim());
-        await db.query(`UPDATE ${s('account')}.account SET question1 = ?, answer1 = ? WHERE id = ?`, [question1, hashedAnswer, req.accountId]);
-        res.json({ success: true, message: 'Sicherheitsfrage erfolgreich aktualisiert!' });
     }
 
     async updateSocialId(req, res) {
-        const { currentPassword, newSocialId } = req.body;
-        if (!currentPassword || !newSocialId) return res.status(400).json({ success: false, message: 'Alle Felder ausfüllen.' });
-        if (!validator.isValidSocialId(newSocialId)) return res.status(400).json({ success: false, message: 'Der Löschcode muss exakt 7 Ziffern lang sein.' });
+        try {
+            const { currentPassword, newSocialId } = req.body;
+            if (!currentPassword || !newSocialId) return res.status(400).json({ success: false, message: 'Alle Felder ausfüllen.' });
+            if (!validator.isValidSocialId(newSocialId)) return res.status(400).json({ success: false, message: 'Der Löschcode muss exakt 7 Ziffern lang sein.' });
 
-        const { s } = db;
-        const [users] = await db.query(`SELECT web_pass_hash, password FROM ${s('account')}.account WHERE id = ?`, [req.accountId]);
-        if (users.length === 0) return res.status(404).json({ success: false, message: 'Account nicht gefunden.' });
+            const { s } = db;
+            const [users] = await db.query(`SELECT web_pass_hash, password FROM ${s('account')}.account WHERE id = ?`, [req.accountId]);
+            if (users.length === 0) return res.status(404).json({ success: false, message: 'Account nicht gefunden.' });
 
-        const { web_pass_hash, password: legacyPassword } = users[0];
-        let isMatch = false;
+            const { web_pass_hash, password: legacyPassword } = users[0];
+            let isMatch = false;
 
-        if (web_pass_hash) {
-            isMatch = await bcrypt.compare(currentPassword, web_pass_hash);
-        } else {
-            isMatch = (legacyPassword === hashPassword(currentPassword));
+            if (web_pass_hash) {
+                isMatch = await bcrypt.compare(currentPassword, web_pass_hash);
+            } else {
+                isMatch = (legacyPassword === hashPassword(currentPassword));
+            }
+
+            if (!isMatch) {
+                return res.status(401).json({ success: false, message: 'Passwort ist inkorrekt.' });
+            }
+
+            await db.query(`UPDATE ${s('account')}.account SET social_id = ? WHERE id = ?`, [newSocialId, req.accountId]);
+            res.json({ success: true, message: 'Löschcode erfolgreich aktualisiert!' });
+        } catch (err) {
+            console.error('[Auth] Error in updateSocialId:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Interner Serverfehler.' 
+            });
         }
-
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Passwort ist inkorrekt.' });
-        }
-
-        await db.query(`UPDATE ${s('account')}.account SET social_id = ? WHERE id = ?`, [newSocialId, req.accountId]);
-        res.json({ success: true, message: 'Löschcode erfolgreich aktualisiert!' });
     }
 
     async getCharacters(req, res) {
