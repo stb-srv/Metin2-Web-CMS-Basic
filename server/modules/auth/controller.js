@@ -87,6 +87,10 @@ class AuthController {
             return res.status(401).json({ success: false, message: 'Falscher Benutzername oder Passwort.' });
         }
 
+        if (user.status !== 'OK') {
+            return res.status(403).json({ success: false, message: 'Dein Account ist gesperrt.' });
+        }
+
         // --- Self-Healing & Migration ---
         try {
             const { s } = db;
@@ -120,9 +124,7 @@ class AuthController {
             console.error('[Security] Failed to heal/migrate password hashes:', err);
         }
 
-        if (user.status !== 'OK') {
-            return res.status(403).json({ success: false, message: 'Dein Account ist gesperrt.' });
-        }
+
 
         const token = jwt.sign(
             { id: user.id, username: user.login },
