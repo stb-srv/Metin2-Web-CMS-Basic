@@ -200,8 +200,20 @@ class WebShopController {
     async getAccounts(req, res) {
         if (!req.adminPermissions.can_give_gifts && !req.adminPermissions.can_manage_players) return res.status(403).json({ success: false, message: 'Fehlende Berechtigung.' });
         const { s } = db;
-        const [accounts] = await db.query(`SELECT id, login FROM ${s('account')}.account ORDER BY login ASC`);
-        res.json({ success: true, accounts });
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 100;
+        const offset = (page - 1) * limit;
+
+        const [accounts] = await db.query(
+            `SELECT id, login FROM ${s('account')}.account 
+             ORDER BY login ASC LIMIT ? OFFSET ?`,
+            [limit, offset]
+        );
+        const [[{ total }]] = await db.query(
+            `SELECT COUNT(*) as total FROM ${s('account')}.account`
+        );
+        res.json({ success: true, accounts, total, page, limit });
     }
 
     async giveDr(req, res) {
