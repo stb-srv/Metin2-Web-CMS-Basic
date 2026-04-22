@@ -54,53 +54,56 @@ class VoteRepository {
 
     // Public: Log vote and grant reward
     async processVote(accountId, linkId, ipAddress) {
-        const [linkRows] = await db.query(`SELECT reward, cooldown_hours, is_active FROM ${s('website')}.vote_links WHERE id = ?`, [linkId]);
-        
-        if (linkRows.length === 0 || linkRows[0].is_active === 0) {
-            throw new Error('Vote-Link nicht gefunden oder inaktiv.');
-        }
-
-        const link = linkRows[0];
-
-        // Ensure user hasn't voted within cooldown period
-        const [logRows] = await db.query(`
-            SELECT voted_at FROM ${s('website')}.vote_logs 
-            WHERE vote_link_id = ? AND (account_id = ? OR ip_address = ?) 
-            ORDER BY voted_at DESC LIMIT 1
-        `, [linkId, accountId, ipAddress]);
-
-        if (logRows.length > 0) {
-            const lastVote = new Date(logRows[0].voted_at);
-            const now = new Date();
-            const diffHours = (now - lastVote) / (1000 * 60 * 60);
-
-            if (diffHours < link.cooldown_hours) {
-                const remainingHours = Math.ceil(link.cooldown_hours - diffHours);
-                throw new Error(`Du hast bereits abgestimmt. Bitte warte noch ${remainingHours} Stunden.`);
-            }
-        }
-
-        // Needs Transaction
+        const { s } = db;
         const conn = await db.getConnection();
         try {
             await conn.beginTransaction();
 
-            // Insert Log
+            // Link abrufen (innerhalb Transaktion)
+            const [linkRows] = await conn.query(
+                `SELECT reward, cooldown_hours, is_active 
+                 FROM ${s('website')}.vote_links WHERE id = ? FOR UPDATE`,
+                [linkId]
+            );
+
+            if (linkRows.length === 0 || linkRows[0].is_active === 0) {
+                await conn.rollback();
+                throw new Error('Vote-Link nicht gefunden oder inaktiv.');
+            }
+            const link = linkRows[0];
+
+            // Cooldown-Check INNERHALB der Transaktion
+            const [logRows] = await conn.query(`
+                SELECT voted_at FROM ${s('website')}.vote_logs
+                WHERE vote_link_id = ? AND (account_id = ? OR ip_address = ?)
+                ORDER BY voted_at DESC LIMIT 1
+            `, [linkId, accountId, ipAddress]);
+
+            if (logRows.length > 0) {
+                const diffHours = (new Date() - new Date(logRows[0].voted_at)) / (1000 * 60 * 60);
+                if (diffHours < link.cooldown_hours) {
+                    const remainingHours = Math.ceil(link.cooldown_hours - diffHours);
+                    await conn.rollback();
+                    throw new Error(`Du hast bereits abgestimmt. Bitte warte noch ${remainingHours} Stunden.`);
+                }
+            }
+
+            // Log + Reward
             await conn.query(
                 `INSERT INTO ${s('website')}.vote_logs (account_id, vote_link_id, ip_address) VALUES (?, ?, ?)`,
                 [accountId, linkId, ipAddress]
             );
-
-            // Grant Reward (using configurable DR column as default for voting)
             const colDR = process.env.DB_COLUMN_DR || 'coins';
-            await conn.query(`UPDATE ${s('account')}.account SET ${colDR} = ${colDR} + ? WHERE id = ?`, [link.reward, accountId]);
+            await conn.query(
+                `UPDATE ${s('account')}.account SET ${colDR} = ${colDR} + ? WHERE id = ?`,
+                [link.reward, accountId]
+            );
 
             await conn.commit();
             return link.reward;
         } catch (err) {
             if (conn) await conn.rollback();
-            console.error('[Votes] processing error:', err);
-            throw new Error('Fehler beim Gewähren der Belohnung.');
+            throw err;
         } finally {
             conn.release();
         }
