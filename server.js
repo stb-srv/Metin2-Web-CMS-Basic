@@ -66,7 +66,7 @@ app.use(cookieParser());
 // --- Setup Guard ---
 const setupGuard = (req, res, next) => {
     if (typeof setup.isSetupNeeded === 'function' && setup.isSetupNeeded()) {
-        const exemptPaths = ['/api/setup', '/setup.html', '/css', '/js', '/images', '/favicon.ico', '/uploads', '/metin2_maintenance_bg'];
+        const exemptPaths = ['/api/setup', '/setup.html', '/css', '/js', '/images', '/themes', '/favicon.ico', '/uploads', '/metin2_maintenance_bg'];
         if (exemptPaths.some(p => req.path.startsWith(p) || req.path === p)) {
             return next();
         }
@@ -91,7 +91,7 @@ const dbGuard = async (req, res, next) => {
     if (typeof setup.isSetupNeeded === 'function' && setup.isSetupNeeded()) return next();
 
     // Exempt static assets and the error page itself
-    const exemptPaths = ['/api/setup', '/db-error.html', '/css', '/js', '/images', '/favicon.ico', '/uploads', '/metin2_maintenance_bg'];
+    const exemptPaths = ['/api/setup', '/db-error.html', '/css', '/js', '/images', '/themes', '/favicon.ico', '/uploads', '/metin2_maintenance_bg'];
     if (exemptPaths.some(p => req.path.startsWith(p) || req.path === p)) return next();
 
     // Cache health check for 30 seconds
@@ -124,7 +124,7 @@ const maintenanceGuard = async (req, res, next) => {
     if (typeof setup.isSetupNeeded === 'function' && setup.isSetupNeeded()) return next();
 
     // 1. Exempt static assets and necessary pages
-    const exemptPaths = ['/api', '/admin', '/setup', '/maintenance.html', '/css', '/js', '/images', '/favicon.ico', '/uploads', '/metin2_maintenance_bg'];
+    const exemptPaths = ['/api', '/admin', '/setup', '/maintenance.html', '/css', '/js', '/images', '/themes', '/favicon.ico', '/uploads', '/metin2_maintenance_bg'];
     if (exemptPaths.some(p => req.path.startsWith(p) || req.path === p)) return next();
 
     try {
