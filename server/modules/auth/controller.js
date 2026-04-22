@@ -7,29 +7,37 @@ const { hashPassword, bcryptHash } = require('../../utils/password');
 
 class AuthController {
     async register(req, res) {
-        const { username, password, email, social_id, real_name, question1, answer1 } = req.body;
+        try {
+            const { username, password, email, social_id, real_name, question1, answer1 } = req.body;
 
-        const validationError = validator.validateRegistration(req.body);
-        if (validationError) {
-            return res.status(400).json({ success: false, message: validationError });
+            const validationError = validator.validateRegistration(req.body);
+            if (validationError) {
+                return res.status(400).json({ success: false, message: validationError });
+            }
+
+            const { s } = db;
+            const [existing] = await db.query(`SELECT login FROM ${s('account')}.account WHERE login = ?`, [username]);
+            if (existing.length > 0) {
+                return res.status(409).json({ success: false, message: 'Dieser Benutzername ist bereits vergeben.' });
+            }
+
+            const hashedPassword = hashPassword(password);
+            const webHash = await bcryptHash(password);
+            const hashedAnswer = await bcryptHash(answer1.toLowerCase().trim());
+
+            await db.query(`
+                INSERT INTO ${s('account')}.account (login, password, web_pass_hash, email, social_id, real_name, question1, answer1, create_time, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'OK')
+            `, [username, hashedPassword, webHash, email, social_id || '1234567', real_name, question1, hashedAnswer]);
+
+            res.status(201).json({ success: true, message: 'Registrierung erfolgreich!' });
+        } catch (err) {
+            console.error('[Auth] Error in register:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Interner Serverfehler.' 
+            });
         }
-
-        const { s } = db;
-        const [existing] = await db.query(`SELECT login FROM ${s('account')}.account WHERE login = ?`, [username]);
-        if (existing.length > 0) {
-            return res.status(409).json({ success: false, message: 'Dieser Benutzername ist bereits vergeben.' });
-        }
-
-        const hashedPassword = hashPassword(password);
-        const webHash = await bcryptHash(password);
-        const hashedAnswer = await bcryptHash(answer1.toLowerCase().trim());
-
-        await db.query(`
-            INSERT INTO ${s('account')}.account (login, password, web_pass_hash, email, social_id, real_name, question1, answer1, create_time, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'OK')
-        `, [username, hashedPassword, webHash, email, social_id || '1234567', real_name, question1, hashedAnswer]);
-
-        res.status(201).json({ success: true, message: 'Registrierung erfolgreich!' });
     }
 
     async login(req, res) {
@@ -149,42 +157,58 @@ class AuthController {
     }
 
     async getMe(req, res) {
-        const colDR = process.env.DB_COLUMN_DR || 'coins';
-        const colDM = process.env.DB_COLUMN_DM || 'cash';
-        
-        const { s } = db;
-        const query = `SELECT ${colDR} as dr_balance, ${colDM} as dm_balance FROM ${s('account')}.account WHERE id = ?`;
-        const [users] = await db.query(query, [req.accountId]);
+        try {
+            const colDR = process.env.DB_COLUMN_DR || 'coins';
+            const colDM = process.env.DB_COLUMN_DM || 'cash';
+            
+            const { s } = db;
+            const query = `SELECT ${colDR} as dr_balance, ${colDM} as dm_balance FROM ${s('account')}.account WHERE id = ?`;
+            const [users] = await db.query(query, [req.accountId]);
 
-        if (users.length === 0) {
-            return res.status(404).json({ success: false, message: 'Benutzer nicht gefunden.' });
+            if (users.length === 0) {
+                return res.status(404).json({ success: false, message: 'Benutzer nicht gefunden.' });
+            }
+
+            res.json({
+                success: true,
+                coins: users[0].dr_balance || 0,
+                cash: users[0].dm_balance || 0
+            });
+        } catch (err) {
+            console.error('[Auth] Error in getMe:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Interner Serverfehler.' 
+            });
         }
-
-        res.json({
-            success: true,
-            coins: users[0].dr_balance || 0,
-            cash: users[0].dm_balance || 0
-        });
     }
 
     async getSettings(req, res) {
-        const { s } = db;
-        const [users] = await db.query(`SELECT email, social_id FROM ${s('account')}.account WHERE id = ?`, [req.accountId]);
-        if (users.length === 0) return res.status(404).json({ success: false, message: 'Account nicht gefunden.' });
+        try {
+            const { s } = db;
+            const [users] = await db.query(`SELECT email, social_id FROM ${s('account')}.account WHERE id = ?`, [req.accountId]);
+            if (users.length === 0) return res.status(404).json({ success: false, message: 'Account nicht gefunden.' });
 
-        const user = users[0];
-        let maskedEmail = user.email;
-        if (maskedEmail && maskedEmail.includes('@')) {
-            const parts = maskedEmail.split('@');
-            maskedEmail = parts[0][0] + '***@' + parts[1];
+            const user = users[0];
+            let maskedEmail = user.email;
+            if (maskedEmail && maskedEmail.includes('@')) {
+                const parts = maskedEmail.split('@');
+                maskedEmail = parts[0][0] + '***@' + parts[1];
+            }
+
+            let maskedSocial = user.social_id || 'Nicht gesetzt';
+            if (maskedSocial.length > 4) {
+                maskedSocial = maskedSocial.substring(0, 3) + '****';
+            }
+
+            res.json({ success: true, maskedEmail, maskedSocial });
+        } catch (err) {
+            console.error('[Auth] Error in getSettings:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Interner Serverfehler.' 
+            });
         }
-
-        let maskedSocial = user.social_id || 'Nicht gesetzt';
-        if (maskedSocial.length > 4) {
-            maskedSocial = maskedSocial.substring(0, 3) + '****';
-        }
-
-        res.json({ success: true, maskedEmail, maskedSocial });
     }
 
     async updatePassword(req, res) {
@@ -269,18 +293,26 @@ class AuthController {
     }
 
     async getCharacters(req, res) {
-        const { s } = db;
-        const query = `
-            SELECT p.id, p.name, p.job, p.level, p.exp, p.playtime, p.gold, 
-                   g.name AS guild_name, pi.empire
-            FROM ${s('player')}.player p
-            LEFT JOIN ${s('player')}.guild_member gm ON gm.pid = p.id
-            LEFT JOIN ${s('player')}.guild g ON g.id = gm.guild_id
-            LEFT JOIN ${s('player')}.player_index pi ON pi.id = p.account_id
-            WHERE p.account_id = ?
-        `;
-        const [chars] = await db.query(query, [req.accountId]);
-        res.json({ success: true, characters: chars });
+        try {
+            const { s } = db;
+            const query = `
+                SELECT p.id, p.name, p.job, p.level, p.exp, p.playtime, p.gold, 
+                       g.name AS guild_name, pi.empire
+                FROM ${s('player')}.player p
+                LEFT JOIN ${s('player')}.guild_member gm ON gm.pid = p.id
+                LEFT JOIN ${s('player')}.guild g ON g.id = gm.guild_id
+                LEFT JOIN ${s('player')}.player_index pi ON pi.id = p.account_id
+                WHERE p.account_id = ?
+            `;
+            const [chars] = await db.query(query, [req.accountId]);
+            res.json({ success: true, characters: chars });
+        } catch (err) {
+            console.error('[Auth] Error in getCharacters:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Interner Serverfehler.' 
+            });
+        }
     }
 
     async unstuckCharacter(req, res) {
