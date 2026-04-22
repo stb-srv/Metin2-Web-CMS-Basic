@@ -7,16 +7,23 @@ class PlayerRepository {
         return rows;
     }
 
-    async getBanHistory() {
+    async getBanHistory(page = 1, limit = 50) {
         const { s } = db;
+        const offset = (page - 1) * limit;
         const query = `
-            SELECT b.*, a.login as account_name 
+            SELECT b.*, a.login as account_name
             FROM ${s('website')}.ban_history b
             LEFT JOIN ${s('account')}.account a ON b.account_id = a.id
-            ORDER BY b.id DESC LIMIT 50
+            ORDER BY b.id DESC
+            LIMIT ? OFFSET ?
         `;
-        const [history] = await db.query(query);
-        return history;
+        const [history] = await db.query(query, [limit, offset]);
+
+        const [[{ total }]] = await db.query(
+            `SELECT COUNT(*) as total FROM ${s('website')}.ban_history`
+        );
+
+        return { history, total };
     }
 
     async banAccount(accountId, data) {

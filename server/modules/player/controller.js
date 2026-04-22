@@ -21,9 +21,18 @@ class PlayerController {
     }
 
     async getHistory(req, res) {
-        if (!req.adminPermissions.can_manage_players) return res.status(403).json({ success: false, message: 'Keine Rechte.' });
-        const history = await repository.getBanHistory();
-        res.json({ success: true, history });
+        try {
+            if (!req.adminPermissions.can_manage_players) {
+                return res.status(403).json({ success: false, message: 'Keine Rechte.' });
+            }
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 50;
+            const { history, total } = await repository.getBanHistory(page, limit);
+            res.json({ success: true, history, total, page, limit });
+        } catch (err) {
+            console.error('[Player] Error in getHistory:', err);
+            res.status(500).json({ success: false, message: 'Interner Serverfehler.' });
+        }
     }
 
     async ban(req, res) {
