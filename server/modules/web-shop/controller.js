@@ -152,7 +152,7 @@ class WebShopController {
 
             res.json({
                 success: true,
-                message: freePos === -1 ? (destination === 'WEB' ? 'Im Web-Lager abgelegt.' : 'Ingame voll, im Web-Lager abgelegt.') : 'Kauf erfolgreich!',
+                message: 'Kauf erfolgreich!',
                 new_coins: balances.col_dr,
                 new_cash: balances.col_dm
             });
