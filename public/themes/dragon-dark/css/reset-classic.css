@@ -1,0 +1,6 @@
+/* Prevent classic theme override */
+body { 
+    background: #05080F !important;
+    color: #F0E6C8 !important;
+    font-family: 'Inter', sans-serif !important;
+}
