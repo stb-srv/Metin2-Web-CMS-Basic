@@ -94,7 +94,18 @@ class AdminRepository {
     async getRecentActivity() {
         const { s } = db;
         const [accounts] = await db.query(`SELECT id, login as username, create_time as timestamp, "account" as type FROM ${s('account')}.account ORDER BY create_time DESC LIMIT 5`);
-        const [bans] = await db.query(`SELECT id, account_id, admin_username, reason, created_at as timestamp, "ban" as type FROM ${s('website')}.ban_history ORDER BY created_at DESC LIMIT 5`);
+        let bans = [];
+        try {
+            const [banRows] = await db.query(
+                `SELECT id, account_id, admin_username, reason, 
+                 created_at as timestamp, "ban" as type 
+                 FROM ${s('website')}.ban_history 
+                 ORDER BY created_at DESC LIMIT 5`
+            );
+            bans = banRows;
+        } catch (banErr) {
+            console.warn('[AdminRepo] ban_history table might be missing, defaulting to [].');
+        }
         
         // Combine and sort by timestamp
         return [...accounts, ...bans].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
