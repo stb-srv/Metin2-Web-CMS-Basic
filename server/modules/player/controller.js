@@ -14,18 +14,40 @@ class PlayerController {
     }
 
     async ban(req, res) {
-        if (!req.adminPermissions.can_manage_players) return res.status(403).json({ success: false, message: 'Keine Rechte.' });
-        const { account_id, reason, duration_days } = req.body;
-        
-        let bannedUntil = null;
-        if (duration_days > 0) {
-            bannedUntil = new Date();
-            bannedUntil.setDate(bannedUntil.getDate() + Number(duration_days));
+        try {
+            const { account_id, reason, duration_days } = req.body;
+
+            if (!req.adminPermissions.can_manage_players) {
+                return res.status(403).json({ success: false, message: 'Keine Rechte.' });
+            }
+
+            if (!account_id || isNaN(parseInt(account_id))) {
+                return res.status(400).json({ success: false, message: 'Ungültige Account-ID.' });
+            }
+
+            if (!reason || reason.trim().length === 0) {
+                return res.status(400).json({ success: false, message: 'Bitte einen Grund angeben.' });
+            }
+
+            let bannedUntil = null;
+            const days = parseInt(duration_days);
+            if (days > 0) {
+                bannedUntil = new Date();
+                bannedUntil.setDate(bannedUntil.getDate() + days);
+            }
+
+            await repository.banAccount(parseInt(account_id), {
+                reason: reason.trim(),
+                bannedUntil,
+                adminUsername: req.adminUsername,
+                isPermanent: !days || days <= 0
+            });
+
+            res.json({ success: true, message: 'Account erfolgreich gebannt.' });
+        } catch (err) {
+            console.error('[Player] Error in ban:', err);
+            res.status(500).json({ success: false, message: 'Interner Serverfehler.' });
         }
-        await repository.banAccount(account_id, {
-            reason, bannedUntil, adminUsername: req.adminUsername, isPermanent: !duration_days || duration_days <= 0
-        });
-        res.json({ success: true, message: 'Account erfolgreich gebannt.' });
     }
 
     async unban(req, res) {
